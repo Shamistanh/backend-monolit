@@ -8,6 +8,10 @@ spring:
     active: dev
   liquibase:
     change-log: classpath:liquibase/changelog-master.yml
+  h2:
+    console:
+      enabled: true
+      path: /h2-ui
 
 cors:
   allowed-origins: "*"
