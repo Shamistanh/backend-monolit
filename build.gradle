@@ -73,6 +73,3 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-bootJar {
-    mainClass  = 'com.pullm.backendmonolit.BackendMonolitApplication'
-}
