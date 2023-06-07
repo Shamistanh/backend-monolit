@@ -74,5 +74,5 @@ tasks.named('test') {
 }
 
 bootJar {
-    mainClassName = 'com.pullm.backendmonolit.BackendMonolitApplication'
+    mainClass  = 'com.pullm.backendmonolit.BackendMonolitApplication'
 }
