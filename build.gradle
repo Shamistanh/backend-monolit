@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'com.pullm'
+version = '0.0.1'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2022.0.3")
+}
+
+dependencies {
+
+//    SPRING BOOT
+    implementation(
+            'org.springframework.boot:spring-boot-starter-web',
+            'org.springframework.boot:spring-boot-starter-data-jpa',
+            'org.springframework.boot:spring-boot-starter-security',
+            'org.springframework.boot:spring-boot-starter-validation',
+            'org.springframework.cloud:spring-cloud-starter-openfeign'
+    )
+
+//    JWT
+    implementation(
+            'io.jsonwebtoken:jjwt-api:0.11.5',
+            'io.jsonwebtoken:jjwt-impl:0.11.5',
+            'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    )
+
+//    OTHERS
+    implementation(
+            'org.liquibase:liquibase-core',
+            'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0',
+            'org.mapstruct:mapstruct:1.5.3.Final'
+    )
+
+    annotationProcessor(
+            'org.projectlombok:lombok',
+            'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    )
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

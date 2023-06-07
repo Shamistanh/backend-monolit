@@ -1,0 +1,20 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+
+spring:
+  profiles:
+    active: dev
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
+
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "*"
+
+#logging:
+#  level:
+#    root: debug

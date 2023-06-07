@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: create book table
+      author: Agil Aghamirzayev
+      description: create users table to store book data
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(16)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(32)
+              - column:
+                  name: bio
+                  type: text
+              - column:
+                  name: birthday
+                  type: timestamp
+              - column:
+                  name: profile_image_id
+                  type: varchar(524)
+              - column:
+                  name: is_enabled
+                  type: bool
