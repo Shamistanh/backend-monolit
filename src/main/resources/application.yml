@@ -23,6 +23,9 @@ spring:
     console:
       enabled: true
 
+springdoc:
+  show-login-endpoint: true
+
 cors:
   allowed-origins: "*"
   allowed-methods: "*"
