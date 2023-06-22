@@ -1,11 +1,11 @@
 databaseChangeLog:
   - changeSet:
-      id: create book table
+      id: create transactions table
       author: Agil Aghamirzayev
-      description: create users table to store book data
+      description: create transactions table to store book data
       changes:
         - createTable:
-            tableName: users
+            tableName: transactions
             columns:
               - column:
                   name: id
@@ -15,36 +15,24 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: username
-                  type: varchar(64)
+                  name: store_name
+                  type: varchar(255)
+              - column:
+                  name: total_amount
+                  type: decimal(38, 2)
+              - column:
+                  name: user_id
+                  type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: user_transaction
+                    references: users(id)
               - column:
-                  name: phone_number
+                  name: transaction_type
                   type: varchar(16)
-                  constraints:
-                    unique: true
-                    nullable: false
               - column:
-                  name: password
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: email
-                  type: varchar(32)
-              - column:
-                  name: bio
-                  type: text
-              - column:
-                  name: birthday
-                  type: timestamp
-              - column:
-                  name: profile_image_id
-                  type: varchar(524)
-              - column:
-                  name: is_enabled
-                  type: bool
+                  name: date
+                  type: date
               - column:
                   name: created_at
                   type: timestamp

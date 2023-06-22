@@ -1,20 +1,28 @@
 server:
-  port: ${PORT}
+  port: ${PORT:8080}
   error:
     include-message: always
 
 spring:
   datasource:
-    url: jdbc:h2:mem:pullm
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/pullm
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+#    url: jdbc:h2:mem:pullm
+#    username: sa
+#    password: password
+#    driverClassName: org.h2.Driver
+
   liquibase:
     change-log: classpath:liquibase/changelog-master.yml
-  h2:
-    console:
-      enabled: true
-      path: /h2-ui
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2-ui
 
 cors:
   allowed-origins: "*"

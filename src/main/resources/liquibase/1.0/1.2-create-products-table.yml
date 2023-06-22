@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: create products table
+      author: Agil Aghamirzayev
+      description: create products table to store book data
+      changes:
+        - createTable:
+            tableName: products
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_type
+                  type: varchar(64)
+              - column:
+                  name: product_sub_type
+                  type: varchar(32)
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: price
+                  type: decimal(10, 2)
+              - column:
+                  name: count
+                  type: int
+              - column:
+                  name: weight
+                  type: decimal(10, 2)
+              - column:
+                  name: transaction_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transaction_product
+                    references: transactions(id)
