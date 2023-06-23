@@ -34,7 +34,6 @@ public class SecurityFilterChainConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("v1/**").permitAll()
                                 .requestMatchers("v1/auths/**").permitAll()
                                 .requestMatchers("swagger-ui/**", "v3/api-docs/**").permitAll()
                                 .requestMatchers("swagger-ui.html").permitAll()
