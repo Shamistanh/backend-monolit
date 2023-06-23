@@ -99,10 +99,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       throw new InvalidOTPException("Invalid user already active");
     }
 
-    // TODO
-//    int otp = (int) (Math.random() * 9000) + 1000;
-//    twilloApi.sendMessage(otp)
-
     var otp = 5555;
 
     if (request.getOtp() != otp) {

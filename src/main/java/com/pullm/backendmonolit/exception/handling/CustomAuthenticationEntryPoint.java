@@ -35,8 +35,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     ObjectMapper mapper = new ObjectMapper();
     mapper.writeValue(responseStream, errorResponse);
 
-    log.error("AuthenticationException: ", authException);
-
     responseStream.flush();
   }
 

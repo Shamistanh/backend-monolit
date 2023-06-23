@@ -22,7 +22,5 @@ public class ActiveAccountRequest {
   private String phoneNumber;
 
   @NotNull(message = "OTP cannot be null")
-//  @Min(value = 4, message = "OTP cannot be less than 4 characters")
-//  @Max(value = 5, message = "OTP cannot be greater than 5 characters")
   private Integer otp;
 }

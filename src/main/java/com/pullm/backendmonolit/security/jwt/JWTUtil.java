@@ -36,7 +36,7 @@ public class JWTUtil {
         .builder()
         .setClaims(claims)
         .setSubject(subject)
-        .setIssuer("traveltech.az")
+        .setIssuer("pullm.com")
         .setIssuedAt(Date.from(Instant.now()))
         .setExpiration(Date.from(Instant.now().plus(15, DAYS)))
         .signWith(getSigningKey(), SignatureAlgorithm.HS256)
