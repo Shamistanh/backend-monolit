@@ -1,12 +1,8 @@
 package com.pullm.backendmonolit.entities;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -35,17 +31,19 @@ public class User implements UserDetails {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(nullable = false)
   private Long id;
-  private String bio;
   private String username;
-  private String email;
   @Column(nullable = false, unique = true)
-  private String phoneNumber;
+  private String email;
   private String password;
   private Boolean isEnabled;
-  private LocalDate birthday;
-  private String profileImageId = "";
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private UserDetail detail;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private OneTimePassword otp;
+
   @CreationTimestamp
   private LocalDateTime createdAt;
   @UpdateTimestamp
@@ -63,7 +61,7 @@ public class User implements UserDetails {
 
   @Override
   public String getUsername() {
-    return phoneNumber;
+    return email;
   }
 
   @Override

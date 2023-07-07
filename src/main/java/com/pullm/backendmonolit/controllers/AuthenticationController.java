@@ -3,7 +3,7 @@ package com.pullm.backendmonolit.controllers;
 
 import com.pullm.backendmonolit.models.request.ActiveAccountRequest;
 import com.pullm.backendmonolit.models.request.AuthenticationRequest;
-import com.pullm.backendmonolit.models.request.RegisterPhoneRequest;
+import com.pullm.backendmonolit.models.request.RegisterRequest;
 import com.pullm.backendmonolit.models.response.AuthenticationResponse;
 import com.pullm.backendmonolit.services.AuthenticationService;
 import jakarta.validation.Valid;
@@ -24,8 +24,7 @@ public class AuthenticationController {
 
   @PostMapping("/register")
   @ResponseStatus(code = HttpStatus.CREATED)
-  public AuthenticationResponse registerWithNumber(
-      @RequestBody @Valid RegisterPhoneRequest request) {
+  public AuthenticationResponse registerWithNumber(@RequestBody @Valid RegisterRequest request) {
     return authenticationService.register(request);
   }
 

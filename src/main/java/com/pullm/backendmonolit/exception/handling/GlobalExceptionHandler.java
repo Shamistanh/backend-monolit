@@ -10,7 +10,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.pullm.backendmonolit.exception.DuplicateResourceException;
-import com.pullm.backendmonolit.exception.InvalidOTPException;
+import com.pullm.backendmonolit.exception.OtpException;
 import com.pullm.backendmonolit.exception.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,8 +100,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ResponseStatus(BAD_REQUEST)
-  @ExceptionHandler(InvalidOTPException.class)
-  public ErrorResponse handleException(InvalidOTPException e) {
+  @ExceptionHandler(OtpException.class)
+  public ErrorResponse handleException(OtpException e) {
 
     ErrorResponse errorResponse = ErrorResponse.builder()
         .customMessage(INVALID_OTP_EXCEPTION.getMessage())
@@ -124,4 +124,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     log.error("DuplicateResourceException: ", e);
     return errorResponse;
   }
+
 }

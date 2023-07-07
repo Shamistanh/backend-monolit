@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,6 +36,7 @@ public class TransactionsServiceImpl implements TransactionsService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional(isolation = Isolation.DEFAULT)
     public void createTransaction(TransactionRequest transactionRequest) {
         log.info("createTransaction().start");
 
@@ -98,7 +101,7 @@ public class TransactionsServiceImpl implements TransactionsService {
 
     private User getUser() {
         var number = extractMobileNumber();
-        var user = userRepository.findUserByPhoneNumber(number)
+        var user = userRepository.findUserByEmail(number)
                 .orElseThrow(() -> new UsernameNotFoundException("Phone number not found"));
 
         log.info("getUser(): user-id: " + user.getId());

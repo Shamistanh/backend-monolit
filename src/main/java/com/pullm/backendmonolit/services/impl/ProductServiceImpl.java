@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
 
     private User getUser() {
         var number = extractMobileNumber();
-        var user = userRepository.findUserByPhoneNumber(number)
+        var user = userRepository.findUserByEmail(number)
                 .orElseThrow(() -> new UsernameNotFoundException("Phone number not found"));
 
         log.info("getUser(): user-id: " + user.getId());

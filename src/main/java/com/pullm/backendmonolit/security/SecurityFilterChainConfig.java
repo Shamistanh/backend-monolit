@@ -33,8 +33,7 @@ public class SecurityFilterChainConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers("v1/auths/**").permitAll()
+                        auth.requestMatchers("v1/auths/**").permitAll()
                                 .requestMatchers("swagger-ui/**", "v3/api-docs/**").permitAll()
                                 .requestMatchers("swagger-ui.html").permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
@@ -47,10 +46,8 @@ public class SecurityFilterChainConfig {
         http.authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.exceptionHandling(
-                        exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        http.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(url -> url.logoutUrl("v1/auths/logout"));
 
         return http.build();
