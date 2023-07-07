@@ -13,9 +13,6 @@ spring:
     username: sa
     password: password
     driverClassName: org.h2.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
 
   liquibase:
     change-log: classpath:liquibase/changelog-master.yml

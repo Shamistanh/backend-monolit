@@ -4,7 +4,7 @@ databaseChangeLog:
       author: Agil Aghamirzayev
       changes:
         - createTable:
-            tableName: user-details
+            tableName: user_details
             columns:
               - column:
                   name: id
