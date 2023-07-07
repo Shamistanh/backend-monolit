@@ -24,6 +24,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -46,6 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Override
+    @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         log.info("register().start username: {}", request.getUsername());
 
@@ -115,7 +117,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new OtpException("Otp expired");
         }
 
-        if (request.getOtp().equals(otp.getPassword())) {
+        if (!request.getOtp().equals(otp.getPassword())) {
             log.error("Invalid otp for user-id: {}", user.getId());
             throw new OtpException("Invalid otp");
         }

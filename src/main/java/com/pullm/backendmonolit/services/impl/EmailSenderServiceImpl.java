@@ -22,11 +22,10 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         String subject = "Here's your One Time Password (OTP) - Expire in 5 minutes!";
 
         String content = """
-                <p>Hello %s </p>
-                <p>For security reason, you're required to use the following One Time Password to login:</p>
-                <p><b> %s </b></p>
-                <br>
-                <p>Note: This OTP is set to expire in 5 minutes.</p>
+                Hello %s
+                For security reason, you're required to use the following One Time Password to login: %s
+               
+                Note: This OTP is set to expire in 5 minutes.
                 """.formatted(user.getUsername(), otp);
 
         SimpleMailMessage message = new SimpleMailMessage();

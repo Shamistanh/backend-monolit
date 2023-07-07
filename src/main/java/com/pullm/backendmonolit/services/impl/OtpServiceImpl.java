@@ -14,8 +14,6 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
 
-    private final PasswordEncoder passwordEncoder;
-
     @Override
     public OneTimePassword generateOTP(String email) {
         Random random = new Random();
@@ -23,7 +21,7 @@ public class OtpServiceImpl implements OtpService {
         String otp = String.valueOf(otpValue);
 
         return OneTimePassword.builder()
-                .password(passwordEncoder.encode(otp))
+                .password(otp)
                 .expiredAt(Instant.now().plus(5, ChronoUnit.MINUTES))
                 .build();
     }
