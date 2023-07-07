@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: create user-details table
+      author: Agil Aghamirzayev
+      changes:
+        - createTable:
+            tableName: user-details
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_user_details_to_users
+                    references: users(id)
+              - column:
+                  name: phone_number
+                  type: varchar(16)
+              - column:
+                  name: bio
+                  type: text
+              - column:
+                  name: birthday
+                  type: timestamp
+              - column:
+                  name: profile_image_id
+                  type: varchar(524)
