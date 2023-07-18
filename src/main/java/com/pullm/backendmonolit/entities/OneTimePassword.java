@@ -1,12 +1,20 @@
 package com.pullm.backendmonolit.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -17,6 +25,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "one_time_passwords")
 public class OneTimePassword {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,10 +33,6 @@ public class OneTimePassword {
     private Instant expiredAt;
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    @MapsId
-    @ToString.Exclude
-    @JoinColumn(name = "id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private User user;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

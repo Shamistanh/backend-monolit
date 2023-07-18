@@ -1,15 +1,48 @@
 package com.pullm.backendmonolit.consatnts;
 
-import com.pullm.backendmonolit.entities.enums.ProductType;
-import com.pullm.backendmonolit.entities.enums.ProductSubType;
-import com.pullm.backendmonolit.exception.ResourceNotFoundException;
-import lombok.Getter;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.ACCESSORIES;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.BANKING;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.BAR;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.BEAUTY;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.CHARITY;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.CLOTHES;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.EDUCATION;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.ELECTRONICS;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.FITNESS;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.FLIGHTS;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.FUEL;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.GIFT;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.GROCERIES;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.HEALTH_CARE;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.HOBBIES;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.HOME;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.HOTEL;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.INSURANCE;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.INVESTMENT;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.LOTTERY;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.PARKING;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.PENALTY;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.PETS;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.PUBLIC_TRANSPORT;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.RENT;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.REPAIR;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.RESTAURANT;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.TAXES;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.TAXI;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.UTILITY;
+import static com.pullm.backendmonolit.entities.enums.ProductType.FOOD_AND_BEVERAGES;
+import static com.pullm.backendmonolit.entities.enums.ProductType.HOUSING_AND_VEHICLE;
+import static com.pullm.backendmonolit.entities.enums.ProductType.LIFE_AND_ENTERTAINMENT;
+import static com.pullm.backendmonolit.entities.enums.ProductType.OTHERS;
+import static com.pullm.backendmonolit.entities.enums.ProductType.SHOPPING;
+import static com.pullm.backendmonolit.entities.enums.ProductType.TRANSPORT;
 
+import com.pullm.backendmonolit.entities.enums.ProductSubType;
+import com.pullm.backendmonolit.entities.enums.ProductType;
+import com.pullm.backendmonolit.exception.NotFoundException;
 import java.util.List;
 import java.util.Map;
-
-import static com.pullm.backendmonolit.entities.enums.ProductType.*;
-import static com.pullm.backendmonolit.entities.enums.ProductSubType.*;
+import lombok.Getter;
 
 @Getter
 public class Constants {
@@ -25,12 +58,13 @@ public class Constants {
 
 
     public static ProductType findProductTypeBySubType(ProductSubType subType) {
-        return TYPES_TO_SUB_TYPES.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue().contains(subType))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElseThrow(( ) -> new ResourceNotFoundException("Product Type not found by subType: " + subType));
+      return TYPES_TO_SUB_TYPES.entrySet()
+          .stream()
+          .filter(entry -> entry.getValue().contains(subType))
+          .map(Map.Entry::getKey)
+          .findFirst()
+          .orElseThrow(
+              () -> new NotFoundException("Product Type not found by subType: " + subType));
     }
 
 

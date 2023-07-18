@@ -1,128 +1,108 @@
 package com.pullm.backendmonolit.exception.handling;
 
-import static com.pullm.backendmonolit.exception.handling.ExceptionsMessages.DUPLICATE_RESOURCE_EXCEPTION;
-import static com.pullm.backendmonolit.exception.handling.ExceptionsMessages.INVALID_OTP_EXCEPTION;
-import static com.pullm.backendmonolit.exception.handling.ExceptionsMessages.METHOD_ARGUMENT_NOT_VALID_EXCEPTION;
-import static com.pullm.backendmonolit.exception.handling.ExceptionsMessages.RESOURCE_NOT_FOUND_EXCEPTION;
-import static com.pullm.backendmonolit.exception.handling.ExceptionsMessages.UNEXPECTED_EXCEPTION;
+import static com.pullm.backendmonolit.exception.handling.ExceptionMessage.BAD_CREDENTIALS_EXCEPTION;
+import static com.pullm.backendmonolit.exception.handling.ExceptionMessage.DUPLICATE_RESOURCE_EXCEPTION;
+import static com.pullm.backendmonolit.exception.handling.ExceptionMessage.INVALID_OTP_EXCEPTION;
+import static com.pullm.backendmonolit.exception.handling.ExceptionMessage.METHOD_ARGUMENT_NOT_VALID_EXCEPTION;
+import static com.pullm.backendmonolit.exception.handling.ExceptionMessage.MISMATCH_EXCEPTION;
+import static com.pullm.backendmonolit.exception.handling.ExceptionMessage.NOT_FOUND_EXCEPTION;
+import static com.pullm.backendmonolit.exception.handling.ExceptionMessage.UNEXPECTED_EXCEPTION;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.pullm.backendmonolit.exception.DuplicateResourceException;
+import com.pullm.backendmonolit.exception.MismatchException;
+import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.exception.OtpException;
-import com.pullm.backendmonolit.exception.ResourceNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Log4j2
 @RestControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler {
 
-  private static List<String> getErrors(MethodArgumentNotValidException ex) {
-    List<String> errors = new ArrayList<>();
+  private static ErrorResponse getErrorResponse(Exception ex, ExceptionMessage message) {
+    return ErrorResponse.builder()
+        .message(message.getMessage())
+        .timestamp(LocalDateTime.now())
+        .error(ex.getMessage())
+        .build();
+  }
+
+  private static Map<String, String> getErrors(MethodArgumentNotValidException ex) {
+    Map<String, String> errors = new HashMap<>();
 
     ex.getBindingResult().getAllErrors().forEach((error) -> {
       String fieldName = ((FieldError) error).getField();
       String errorMessage = error.getDefaultMessage();
-      errors.add(fieldName + ": " + errorMessage);
+      errors.put(fieldName, errorMessage);
     });
 
     return errors;
   }
 
+  @ExceptionHandler(Exception.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handle(Exception ex) {
+    log.error("Exception: ", ex);
+    return getErrorResponse(ex, UNEXPECTED_EXCEPTION);
+  }
+
   @ResponseStatus(NOT_FOUND)
-  @ExceptionHandler(ResourceNotFoundException.class)
-  public ErrorResponse handleException(ResourceNotFoundException e) {
-
-    ErrorResponse errorResponse = ErrorResponse.builder()
-        .customMessage(RESOURCE_NOT_FOUND_EXCEPTION.getMessage())
-        .details(List.of(e.getLocalizedMessage()))
-        .build();
-
+  @ExceptionHandler(NotFoundException.class)
+  public ErrorResponse handleException(NotFoundException e) {
     log.error("ResourceNotFoundException: ", e);
-
-    return errorResponse;
+    return getErrorResponse(e, NOT_FOUND_EXCEPTION);
   }
 
   @ResponseStatus(UNAUTHORIZED)
   @ExceptionHandler(BadCredentialsException.class)
   public ErrorResponse handleException(BadCredentialsException e) {
-
-    ErrorResponse errorResponse = ErrorResponse.builder()
-        .customMessage(RESOURCE_NOT_FOUND_EXCEPTION.getMessage())
-        .details(List.of(e.getLocalizedMessage()))
-        .build();
-
     log.error("BadCredentialsException: ", e);
-    return errorResponse;
+    return getErrorResponse(e, BAD_CREDENTIALS_EXCEPTION);
   }
 
-  @Override
-  protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body,
-      HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
-
-    ErrorResponse errorResponse = ErrorResponse.builder()
-        .customMessage(UNEXPECTED_EXCEPTION.getMessage())
-        .details(List.of(ex.getMessage()))
-        .build();
-
-    log.error("Exception: ", ex);
-
-    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-  }
-
-  @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-      HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-
-    ErrorResponse error = ErrorResponse.builder()
-        .customMessage(METHOD_ARGUMENT_NOT_VALID_EXCEPTION.getMessage())
-        .details(getErrors(ex))
-        .build();
-
+  @ResponseStatus(BAD_REQUEST)
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ErrorResponseDetail handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
     log.error("MethodArgumentNotValidException: ", ex);
 
-    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    return ErrorResponseDetail.builder()
+        .customMessage(METHOD_ARGUMENT_NOT_VALID_EXCEPTION.getMessage())
+        .details(getErrors(ex))
+        .timestamp(LocalDateTime.now())
+        .build();
   }
 
   @ResponseStatus(BAD_REQUEST)
   @ExceptionHandler(OtpException.class)
   public ErrorResponse handleException(OtpException e) {
-
-    ErrorResponse errorResponse = ErrorResponse.builder()
-        .customMessage(INVALID_OTP_EXCEPTION.getMessage())
-        .details(List.of(e.getLocalizedMessage()))
-        .build();
-
     log.error("InvalidOTPException: ", e);
-    return errorResponse;
+    return getErrorResponse(e, INVALID_OTP_EXCEPTION);
   }
 
   @ResponseStatus(BAD_REQUEST)
   @ExceptionHandler(DuplicateResourceException.class)
   public ErrorResponse handleException(DuplicateResourceException e) {
-
-    ErrorResponse errorResponse = ErrorResponse.builder()
-        .customMessage(DUPLICATE_RESOURCE_EXCEPTION.getMessage())
-        .details(List.of(e.getLocalizedMessage()))
-        .build();
-
     log.error("DuplicateResourceException: ", e);
-    return errorResponse;
+    return getErrorResponse(e, DUPLICATE_RESOURCE_EXCEPTION);
+  }
+
+  @ResponseStatus(BAD_REQUEST)
+  @ExceptionHandler(MismatchException.class)
+  public ErrorResponse handleException(MismatchException e) {
+    log.error("MismatchException: ", e);
+    return getErrorResponse(e, MISMATCH_EXCEPTION);
   }
 
 }

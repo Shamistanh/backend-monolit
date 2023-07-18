@@ -1,5 +1,6 @@
 package com.pullm.backendmonolit.services.impl;
 
+import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     return userRepository.findUserByEmail(username).orElseThrow(() ->
-            new UsernameNotFoundException("Email not found"));
+        new NotFoundException("Email not found"));
   }
 }

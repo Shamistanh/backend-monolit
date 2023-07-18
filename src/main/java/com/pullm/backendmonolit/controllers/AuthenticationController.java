@@ -3,6 +3,8 @@ package com.pullm.backendmonolit.controllers;
 
 import com.pullm.backendmonolit.models.request.ActiveAccountRequest;
 import com.pullm.backendmonolit.models.request.AuthenticationRequest;
+import com.pullm.backendmonolit.models.request.EmailRequest;
+import com.pullm.backendmonolit.models.request.ForgetPasswordRequest;
 import com.pullm.backendmonolit.models.request.RegisterRequest;
 import com.pullm.backendmonolit.models.response.AuthenticationResponse;
 import com.pullm.backendmonolit.services.AuthenticationService;
@@ -38,6 +40,18 @@ public class AuthenticationController {
   @ResponseStatus(code = HttpStatus.OK)
   public void activateAccount(@RequestBody @Valid ActiveAccountRequest request) {
     authenticationService.activateAccount(request);
+  }
+
+  @PostMapping("/forgot-password/otp")
+  @ResponseStatus(code = HttpStatus.OK)
+  public void sendEmail(@RequestBody @Valid EmailRequest request) {
+    authenticationService.sendEmail(request);
+  }
+
+  @PostMapping("/forgot-password")
+  @ResponseStatus(code = HttpStatus.OK)
+  public void forgetPassword(@RequestBody @Valid ForgetPasswordRequest request) {
+    authenticationService.forgetPassword(request);
   }
 
 }

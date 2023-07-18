@@ -3,10 +3,10 @@ package com.pullm.backendmonolit.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(code = HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
+@ResponseStatus(code = HttpStatus.CONFLICT)
+public class MismatchException extends RuntimeException {
 
-  public ResourceNotFoundException(String message) {
+  public MismatchException(String message) {
     super(message);
   }
 }

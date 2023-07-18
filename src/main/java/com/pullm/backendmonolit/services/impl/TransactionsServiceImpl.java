@@ -1,30 +1,28 @@
 package com.pullm.backendmonolit.services.impl;
 
+import static com.pullm.backendmonolit.consatnts.Constants.findProductTypeBySubType;
+
 import com.pullm.backendmonolit.entities.Product;
 import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.entities.enums.TransactionType;
-import com.pullm.backendmonolit.exception.ResourceNotFoundException;
+import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.mapper.TransactionMapper;
 import com.pullm.backendmonolit.models.request.TransactionRequest;
 import com.pullm.backendmonolit.models.response.TransactionResponse;
 import com.pullm.backendmonolit.repository.TransactionRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.TransactionsService;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-
-import static com.pullm.backendmonolit.consatnts.Constants.findProductTypeBySubType;
 
 @Log4j2
 @Service
@@ -68,8 +66,8 @@ public class TransactionsServiceImpl implements TransactionsService {
     public void updateTransaction(Long id, TransactionRequest transactionRequest) {
         log.info("updateTransaction().start");
 
-        var transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found by id " + id));
+      var transaction = transactionRepository.findById(id)
+          .orElseThrow(() -> new NotFoundException("Transaction not found by id " + id));
 
         if (transactionRequest.getStoreName() != null) {
             transaction.setStoreName(transactionRequest.getStoreName());
@@ -100,18 +98,18 @@ public class TransactionsServiceImpl implements TransactionsService {
     }
 
     private User getUser() {
-        var number = extractMobileNumber();
-        var user = userRepository.findUserByEmail(number)
-                .orElseThrow(() -> new UsernameNotFoundException("Phone number not found"));
+      var email = extractEmail();
+      var user = userRepository.findUserByEmail(email)
+          .orElseThrow(() -> new NotFoundException("Email not found"));
 
-        log.info("getUser(): user-id: " + user.getId());
+      log.info("getUser(): user-id: " + user.getId());
 
-        return user;
+      return user;
     }
 
-    private String extractMobileNumber() {
-        var userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        return userDetails.getUsername();
-    }
+  private String extractEmail() {
+    var userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    return userDetails.getUsername();
+  }
 }

@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-fk-to-user-table
+      author: Agil Aghamirzayev
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: otp_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_user_to_one_time_passwords
+                    references: one_time_passwords(id)

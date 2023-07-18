@@ -1,9 +1,15 @@
 package com.pullm.backendmonolit.entities;
 
 
-import jakarta.persistence.*;
-
-import java.time.LocalDate;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +38,7 @@ public class User implements UserDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String username;
+  private String fullName;
   @Column(nullable = false, unique = true)
   private String email;
   private String password;
@@ -41,7 +47,9 @@ public class User implements UserDetails {
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   private UserDetail detail;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  @ToString.Exclude
+  @JoinColumn(name = "otp_id")
+  @OneToOne(cascade = CascadeType.ALL)
   private OneTimePassword otp;
 
   @CreationTimestamp

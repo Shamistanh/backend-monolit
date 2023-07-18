@@ -2,13 +2,11 @@ package com.pullm.backendmonolit.services.impl;
 
 import com.pullm.backendmonolit.entities.OneTimePassword;
 import com.pullm.backendmonolit.services.OtpService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +22,5 @@ public class OtpServiceImpl implements OtpService {
                 .password(otp)
                 .expiredAt(Instant.now().plus(5, ChronoUnit.MINUTES))
                 .build();
-    }
-
-    @Override
-    public boolean validateOTP(String email, String otp) {
-        return false;
     }
 }

@@ -10,6 +10,6 @@ public interface UserMapper {
 
   UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-  User mapToUser(RegisterRequest studentRequest);
+  User mapToUser(RegisterRequest registerRequest);
 
 }
