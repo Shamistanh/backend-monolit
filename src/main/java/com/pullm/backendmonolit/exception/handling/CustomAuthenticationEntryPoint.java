@@ -1,10 +1,9 @@
 package com.pullm.backendmonolit.exception.handling;
 
-import static com.pullm.backendmonolit.exception.handling.ExceptionMessage.AUTHENTICATION_FAILED;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,6 +35,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     OutputStream responseStream = response.getOutputStream();
     ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
     mapper.writeValue(responseStream, errorResponseDetail);
 
 //    responseStream.flush();
