@@ -11,7 +11,7 @@ public interface AuthenticationService {
 
   AuthenticationResponse login(AuthenticationRequest request);
 
-  AuthenticationResponse register(RegisterRequest request);
+  void register(RegisterRequest request);
 
   void activateAccount(ActiveAccountRequest request);
 

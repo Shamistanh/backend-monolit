@@ -10,7 +10,6 @@ import com.pullm.backendmonolit.exception.DuplicateResourceException;
 import com.pullm.backendmonolit.exception.MismatchException;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.exception.OtpException;
-import com.pullm.backendmonolit.mapper.UserMapper;
 import com.pullm.backendmonolit.models.request.ActiveAccountRequest;
 import com.pullm.backendmonolit.models.request.AuthenticationRequest;
 import com.pullm.backendmonolit.models.request.EmailRequest;
@@ -23,10 +22,9 @@ import com.pullm.backendmonolit.services.AuthenticationService;
 import com.pullm.backendmonolit.services.EmailSenderService;
 import com.pullm.backendmonolit.services.OtpService;
 import java.time.Instant;
-import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -40,11 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final UserMapper userMapper = UserMapper.INSTANCE;
-
     private final JWTUtil jwtUtil;
     private final OtpService otpService;
-    private final CacheManager cacheManager;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSenderService emailSenderService;
@@ -52,17 +47,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     @Transactional
-    public AuthenticationResponse register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         log.info("register().start username: {}", request.getFullName());
 
         var email = request.getEmail();
 
-        if (userRepository.existsUserByEmail(email)) {
-            log.error("register().error Email already exists number");
-            throw new DuplicateResourceException(DUPLICATE_RESOURCE_EXCEPTION.getMessage());
-        }
-
+        Optional<User> userByEmail = userRepository.findUserByEmail(email);
         OneTimePassword otp = otpService.generateOTP(email);
+
+        if (userByEmail.isPresent()) {
+            User user = userByEmail.get();
+            if (!user.getIsEnabled()) {
+                emailSenderService.send(user, otp.getPassword());
+                return;
+            } else {
+                log.error("register().error Email already exists number");
+                throw new DuplicateResourceException(DUPLICATE_RESOURCE_EXCEPTION.getMessage());
+            }
+        }
 
         var user = User.builder()
             .otp(otp)
@@ -75,12 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
         emailSenderService.send(user, otp.getPassword());
 
-        var jwtToken = jwtUtil.generateToken(user.getEmail(), "ROLE_USER");
-
-        Objects.requireNonNull(cacheManager.getCache("response")).clear();
-
         log.info("register().end user-id: {}", user.getId());
-        return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
 
