@@ -15,7 +15,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResponse {
-
   private String error;
   private List<String> messages;
   private LocalDateTime timestamp;
