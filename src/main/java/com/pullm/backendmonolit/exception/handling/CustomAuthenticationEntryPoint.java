@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -25,7 +27,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     log.error("Unauthorized error: {}", authException.getMessage());
 
     ErrorResponse errorResponseDetail = ErrorResponse.builder()
-        .message(ExceptionMessage.UNAUTHORIZED.getMessage())
+        .messages(List.of(ExceptionMessage.UNAUTHORIZED.getMessage()))
         .error(authException.getMessage())
         .timestamp(LocalDateTime.now())
         .build();
@@ -38,7 +40,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     mapper.registerModule(new JavaTimeModule());
     mapper.writeValue(responseStream, errorResponseDetail);
 
-//    responseStream.flush();
+    responseStream.flush();
   }
 
 }
