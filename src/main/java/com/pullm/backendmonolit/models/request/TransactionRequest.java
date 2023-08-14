@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -15,5 +15,5 @@ import java.util.List;
 public class TransactionRequest {
     private String storeName;
     private List<ProductRequest> products;
-    private LocalDate date;
+    private LocalDateTime date;
 }

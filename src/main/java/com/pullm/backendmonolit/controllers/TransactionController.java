@@ -2,12 +2,14 @@ package com.pullm.backendmonolit.controllers;
 
 import com.pullm.backendmonolit.models.request.TransactionRequest;
 import com.pullm.backendmonolit.models.response.TransactionResponse;
-import com.pullm.backendmonolit.services.TransactionsService;
+import com.pullm.backendmonolit.services.impl.TransactionsServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -15,7 +17,7 @@ import java.util.List;
 @RequestMapping("v1/transactions")
 public class TransactionController {
 
-    private final TransactionsService transactionsService;
+    private final TransactionsServiceImpl transactionsService;
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
@@ -34,7 +36,10 @@ public class TransactionController {
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public List<TransactionResponse> getAllTransactions() {
-        return transactionsService.getAllTransactions();
+    public List<TransactionResponse> getAllTransactions(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                        LocalDateTime startDate,
+                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                        LocalDateTime endDate) {
+        return transactionsService.getAllTransactions(startDate, endDate);
     }
 }

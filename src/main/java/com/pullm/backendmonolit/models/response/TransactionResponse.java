@@ -1,12 +1,11 @@
 package com.pullm.backendmonolit.models.response;
 
-import com.pullm.backendmonolit.entities.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,10 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionResponse {
-    private Long id;
-    private String storeName;
-    private BigDecimal totalAmount;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-    private TransactionType transactionType;
-    private List<ProductResponse> products;
+    private List<TransactionDetailsResponse> transactionDetails;
 }

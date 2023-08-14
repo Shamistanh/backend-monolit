@@ -12,10 +12,12 @@ import com.pullm.backendmonolit.models.request.TransactionRequest;
 import com.pullm.backendmonolit.models.response.TransactionResponse;
 import com.pullm.backendmonolit.repository.TransactionRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
-import com.pullm.backendmonolit.services.TransactionsService;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,13 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class TransactionsServiceImpl implements TransactionsService {
+public class TransactionsServiceImpl {
 
     private final TransactionMapper transactionMapper = TransactionMapper.INSTANCE;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
 
-    @Override
     @Transactional(isolation = Isolation.DEFAULT)
     public void createTransaction(TransactionRequest transactionRequest) {
         log.info("createTransaction().start");
@@ -62,12 +63,11 @@ public class TransactionsServiceImpl implements TransactionsService {
         log.info("createTransaction().end with transaction id: " + transaction.getId());
     }
 
-    @Override
     public void updateTransaction(Long id, TransactionRequest transactionRequest) {
         log.info("updateTransaction().start");
 
-      var transaction = transactionRepository.findById(id)
-          .orElseThrow(() -> new NotFoundException("Transaction not found by id " + id));
+        var transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Transaction not found by id " + id));
 
         if (transactionRequest.getStoreName() != null) {
             transaction.setStoreName(transactionRequest.getStoreName());
@@ -82,15 +82,13 @@ public class TransactionsServiceImpl implements TransactionsService {
         log.info("updateTransaction().end with transaction id: " + transaction.getId());
     }
 
-    @Override
-    public List<TransactionResponse> getAllTransactions() {
+    public List<TransactionResponse> getAllTransactions(LocalDateTime startDate, LocalDateTime endDate) {
         log.info("getAllTransactions().start");
 
         User user = getUser();
 
-        var transactions = transactionRepository.findAllByUserId(user.getId());
-
-        var transactionRequests = transactionMapper.mapToTransactionResonseList(transactions);
+        var transactions = transactionRepository.findAllByUserIdAndDateBetween(user.getId(), startDate, endDate);
+        var transactionRequests = transactionMapper.mapToTransactionResponseList(transactions);
 
         log.info("getAllTransactions().end");
 
@@ -98,18 +96,18 @@ public class TransactionsServiceImpl implements TransactionsService {
     }
 
     private User getUser() {
-      var email = extractEmail();
-      var user = userRepository.findUserByEmail(email)
-          .orElseThrow(() -> new NotFoundException("Email not found"));
+        var email = extractEmail();
+        var user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Email not found"));
 
-      log.info("getUser(): user-id: " + user.getId());
+        log.info("getUser(): user-id: " + user.getId());
 
-      return user;
+        return user;
     }
 
-  private String extractEmail() {
-    var userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    return userDetails.getUsername();
-  }
+    private String extractEmail() {
+        var userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        return userDetails.getUsername();
+    }
 }

@@ -28,7 +28,7 @@ public class Transaction {
     private Long id;
     private String storeName;
     private BigDecimal totalAmount;
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
