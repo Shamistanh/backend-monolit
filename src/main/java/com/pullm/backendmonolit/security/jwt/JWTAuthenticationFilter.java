@@ -1,6 +1,7 @@
 package com.pullm.backendmonolit.security.jwt;
 
 
+import com.pullm.backendmonolit.exception.TokenNotValidException;
 import com.pullm.backendmonolit.services.impl.UserDetailServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,6 +48,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else {
+                throw new TokenNotValidException("Token not valid");
             }
         }
         filterChain.doFilter(request, response);

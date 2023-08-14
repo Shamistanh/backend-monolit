@@ -42,13 +42,13 @@ public class AuthenticationController {
     authenticationService.activateAccount(request);
   }
 
-  @PostMapping("/forgot-password/otp")
+  @PostMapping("/reset-password/otp")
   @ResponseStatus(code = HttpStatus.OK)
   public void sendEmail(@RequestBody @Valid EmailRequest request) {
     authenticationService.sendEmail(request);
   }
 
-  @PostMapping("/forgot-password")
+  @PostMapping("/reset-password")
   @ResponseStatus(code = HttpStatus.OK)
   public void forgetPassword(@RequestBody @Valid ForgetPasswordRequest request) {
     authenticationService.forgetPassword(request);
