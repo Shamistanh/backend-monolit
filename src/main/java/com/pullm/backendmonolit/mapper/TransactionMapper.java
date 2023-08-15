@@ -5,12 +5,12 @@ import com.pullm.backendmonolit.models.request.TransactionRequest;
 import com.pullm.backendmonolit.models.response.ProductResponse;
 import com.pullm.backendmonolit.models.response.TransactionDetailsResponse;
 import com.pullm.backendmonolit.models.response.TransactionResponse;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
-
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface TransactionMapper {
@@ -21,6 +21,7 @@ public interface TransactionMapper {
 
     default List<TransactionResponse> mapToTransactionResponseList(List<Transaction> transactions) {
         var transactionsByDateAndStore = transactions.stream()
+                .sorted(Comparator.comparing(Transaction::getDate).reversed())
                 .collect(Collectors.groupingBy(transaction -> transaction.getDate().toLocalDate(),
                         Collectors.groupingBy(Transaction::getStoreName)));
 

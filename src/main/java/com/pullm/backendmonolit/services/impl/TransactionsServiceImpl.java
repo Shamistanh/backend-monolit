@@ -8,16 +8,16 @@ import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.entities.enums.TransactionType;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.mapper.TransactionMapper;
+import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.TransactionRequest;
 import com.pullm.backendmonolit.models.response.TransactionResponse;
 import com.pullm.backendmonolit.repository.TransactionRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -82,12 +82,14 @@ public class TransactionsServiceImpl {
         log.info("updateTransaction().end with transaction id: " + transaction.getId());
     }
 
-    public List<TransactionResponse> getAllTransactions(LocalDateTime startDate, LocalDateTime endDate) {
-        log.info("getAllTransactions().start");
+    public List<TransactionResponse> getAllTransactions(DateCriteria dateCriteria) {
+        log.info("getAllTransactions().start DateCriteria: {}", dateCriteria);
 
         User user = getUser();
+        LocalDateTime fromDate = dateCriteria.getFromDate().atStartOfDay();
+        LocalDateTime toDate = dateCriteria.getToDate().atStartOfDay();
 
-        var transactions = transactionRepository.findAllByUserIdAndDateBetween(user.getId(), startDate, endDate);
+        var transactions = transactionRepository.findAllByUserIdAndDateBetween(user.getId(), fromDate, toDate);
         var transactionRequests = transactionMapper.mapToTransactionResponseList(transactions);
 
         log.info("getAllTransactions().end");

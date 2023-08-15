@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
 
-  @GetMapping
-  public String test() {
-    return "Welcome to secure api";
-  }
+    @GetMapping
+    public String test() {
+        return "Welcome to secure api";
+    }
 
 }

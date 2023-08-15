@@ -9,13 +9,13 @@ import com.pullm.backendmonolit.models.response.AuthenticationResponse;
 
 public interface AuthenticationService {
 
-  AuthenticationResponse login(AuthenticationRequest request);
+    AuthenticationResponse login(AuthenticationRequest request);
 
-  void register(RegisterRequest request);
+    void register(RegisterRequest request);
 
-  void activateAccount(ActiveAccountRequest request);
+    void activateAccount(ActiveAccountRequest request);
 
-  void sendEmail(EmailRequest request);
+    void sendEmail(EmailRequest request);
 
-  void forgetPassword(ForgetPasswordRequest request);
+    void forgetPassword(ForgetPasswordRequest request);
 }

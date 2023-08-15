@@ -35,61 +35,61 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "users")
 public class User implements UserDetails {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  private String fullName;
-  @Column(nullable = false, unique = true)
-  private String email;
-  private String password;
-  private Boolean isEnabled;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String fullName;
+    @Column(nullable = false, unique = true)
+    private String email;
+    private String password;
+    private Boolean isEnabled;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-  private UserDetail detail;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserDetail detail;
 
-  @ToString.Exclude
-  @JoinColumn(name = "otp_id")
-  @OneToOne(cascade = CascadeType.ALL)
-  private OneTimePassword otp;
+    @ToString.Exclude
+    @JoinColumn(name = "otp_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    private OneTimePassword otp;
 
-  @CreationTimestamp
-  private LocalDateTime createdAt;
-  @UpdateTimestamp
-  private LocalDateTime updatedAt;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
-  @Override
-  public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-  }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
 
-  @Override
-  public String getPassword() {
-    return password;
-  }
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
-  @Override
-  public String getUsername() {
-    return email;
-  }
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
-  }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-  @Override
-  public boolean isEnabled() {
-    return isEnabled;
-  }
+    @Override
+    public boolean isEnabled() {
+        return isEnabled;
+    }
 
 }

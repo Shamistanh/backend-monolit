@@ -2,5 +2,5 @@ package com.pullm.backendmonolit.services;
 
 public interface UserService {
 
-  void addUserDetails(Long id);
+    void addUserDetails(Long id);
 }

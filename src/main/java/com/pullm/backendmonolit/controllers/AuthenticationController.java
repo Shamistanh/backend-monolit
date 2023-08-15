@@ -22,36 +22,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("v1/auths")
 public class AuthenticationController {
 
-  private final AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
-  @PostMapping("/register")
-  @ResponseStatus(code = HttpStatus.CREATED)
-  public void registerWithNumber(@RequestBody @Valid RegisterRequest request) {
-    authenticationService.register(request);
-  }
+    @PostMapping("/register")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public void registerWithNumber(@RequestBody @Valid RegisterRequest request) {
+        authenticationService.register(request);
+    }
 
-  @PostMapping("/login")
-  @ResponseStatus(code = HttpStatus.OK)
-  public AuthenticationResponse login(@RequestBody @Valid AuthenticationRequest request) {
-    return authenticationService.login(request);
-  }
+    @PostMapping("/login")
+    @ResponseStatus(code = HttpStatus.OK)
+    public AuthenticationResponse login(@RequestBody @Valid AuthenticationRequest request) {
+        return authenticationService.login(request);
+    }
 
-  @PostMapping("/activate")
-  @ResponseStatus(code = HttpStatus.OK)
-  public void activateAccount(@RequestBody @Valid ActiveAccountRequest request) {
-    authenticationService.activateAccount(request);
-  }
+    @PostMapping("/activate")
+    @ResponseStatus(code = HttpStatus.OK)
+    public void activateAccount(@RequestBody @Valid ActiveAccountRequest request) {
+        authenticationService.activateAccount(request);
+    }
 
-  @PostMapping("/reset-password/otp")
-  @ResponseStatus(code = HttpStatus.OK)
-  public void sendEmail(@RequestBody @Valid EmailRequest request) {
-    authenticationService.sendEmail(request);
-  }
+    @PostMapping("/reset-password/otp")
+    @ResponseStatus(code = HttpStatus.OK)
+    public void sendEmail(@RequestBody @Valid EmailRequest request) {
+        authenticationService.sendEmail(request);
+    }
 
-  @PostMapping("/reset-password")
-  @ResponseStatus(code = HttpStatus.OK)
-  public void forgetPassword(@RequestBody @Valid ForgetPasswordRequest request) {
-    authenticationService.forgetPassword(request);
-  }
+    @PostMapping("/reset-password")
+    @ResponseStatus(code = HttpStatus.OK)
+    public void forgetPassword(@RequestBody @Valid ForgetPasswordRequest request) {
+        authenticationService.forgetPassword(request);
+    }
 
 }

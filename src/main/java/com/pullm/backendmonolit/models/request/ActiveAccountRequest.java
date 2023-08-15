@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ActiveAccountRequest {
 
-  @Email(message = "Email is not valid")
-  @NotNull(message = "Email cannot be null")
-  @NotEmpty(message = "Email cannot be empty")
-  private String email;
+    @Email(message = "Email is not valid")
+    @NotNull(message = "Email cannot be null")
+    @NotEmpty(message = "Email cannot be empty")
+    private String email;
 
-  @NotNull(message = "OTP cannot be null")
-  @Size(min = 4, max = 4, message = "OTP length must be 4")
-  private String otp;
+    @NotNull(message = "OTP cannot be null")
+    @Size(min = 4, max = 4, message = "OTP length must be 4")
+    private String otp;
 }

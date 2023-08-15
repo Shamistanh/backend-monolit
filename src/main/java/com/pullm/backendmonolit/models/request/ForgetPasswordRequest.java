@@ -15,20 +15,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ForgetPasswordRequest {
 
-  @Email(message = "Email is not valid")
-  @NotNull(message = "Email cannot be null")
-  @NotEmpty(message = "Email cannot be empty")
-  private String email;
+    @Email(message = "Email is not valid")
+    @NotNull(message = "Email cannot be null")
+    @NotEmpty(message = "Email cannot be empty")
+    private String email;
 
-  @NotEmpty(message = "Password cannot be empty")
-  @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
-  private String newPassword;
+    @NotEmpty(message = "Password cannot be empty")
+    @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
+    private String newPassword;
 
-  @NotEmpty(message = "Password cannot be empty")
-  @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
-  private String confirmPassword;
+    @NotEmpty(message = "Password cannot be empty")
+    @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
+    private String confirmPassword;
 
-  @NotNull(message = "OTP cannot be null")
-  @Size(min = 4, max = 4, message = "OTP length must be 4")
-  private String otp;
+    @NotNull(message = "OTP cannot be null")
+    @Size(min = 4, max = 4, message = "OTP length must be 4")
+    private String otp;
 }

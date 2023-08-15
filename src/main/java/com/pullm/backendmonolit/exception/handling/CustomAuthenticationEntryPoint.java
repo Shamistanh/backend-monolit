@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -21,26 +20,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-  @Override
-  public void commence(HttpServletRequest request, HttpServletResponse response,
-      AuthenticationException authException) throws IOException {
-    log.error("Unauthorized error: {}", authException.getMessage());
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+                         AuthenticationException authException) throws IOException {
+        log.error("Unauthorized error: {}", authException.getMessage());
 
-    ErrorResponse errorResponseDetail = ErrorResponse.builder()
-        .messages(List.of(ExceptionMessage.UNAUTHORIZED.getMessage()))
-        .error(authException.getMessage())
-        .timestamp(LocalDateTime.now())
-        .build();
+        ErrorResponse errorResponseDetail = ErrorResponse.builder()
+                .messages(List.of(ExceptionMessage.UNAUTHORIZED.getMessage()))
+                .error(authException.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
 
-    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    response.setStatus(SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(SC_UNAUTHORIZED);
 
-    OutputStream responseStream = response.getOutputStream();
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new JavaTimeModule());
-    mapper.writeValue(responseStream, errorResponseDetail);
+        OutputStream responseStream = response.getOutputStream();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.writeValue(responseStream, errorResponseDetail);
 
-    responseStream.flush();
-  }
+        responseStream.flush();
+    }
 
 }

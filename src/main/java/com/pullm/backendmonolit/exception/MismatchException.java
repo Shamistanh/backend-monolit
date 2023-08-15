@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(code = HttpStatus.CONFLICT)
 public class MismatchException extends RuntimeException {
 
-  public MismatchException(String message) {
-    super(message);
-  }
+    public MismatchException(String message) {
+        super(message);
+    }
 }

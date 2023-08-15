@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EmailRequest {
 
-  @Email(message = "Email is not valid")
-  @NotNull(message = "Email cannot be null")
-  @NotEmpty(message = "Email cannot be empty")
-  private String email;
+    @Email(message = "Email is not valid")
+    @NotNull(message = "Email cannot be null")
+    @NotEmpty(message = "Email cannot be empty")
+    private String email;
 }

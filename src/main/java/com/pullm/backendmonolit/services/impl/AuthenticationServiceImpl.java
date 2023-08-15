@@ -67,12 +67,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         var user = User.builder()
-            .otp(otp)
-            .isEnabled(Boolean.FALSE)
-            .email(request.getEmail())
-            .fullName(request.getFullName())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .build();
+                .otp(otp)
+                .isEnabled(Boolean.FALSE)
+                .email(request.getEmail())
+                .fullName(request.getFullName())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
 
         userRepository.save(user);
         emailSenderService.send(user, otp.getPassword());
@@ -86,7 +86,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("login().start");
 
         var dbUser = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() ->
-            new NotFoundException("Email not found"));
+                new NotFoundException("Email not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), dbUser.getPassword())) {
             log.error("Password does not match");
@@ -94,16 +94,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         var authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         var user = (User) authentication.getPrincipal();
 
         var roles = user.getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .toList();
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
         var jwtToken = jwtUtil.generateToken(user.getEmail(), roles);
 
@@ -116,7 +116,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void activateAccount(ActiveAccountRequest request) {
         log.info("activateAccount().start");
         var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() ->
-            new NotFoundException("Email not found"));
+                new NotFoundException("Email not found"));
 
         if (user.getIsEnabled()) {
             log.error("Invalid user already active");
@@ -146,7 +146,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void sendEmail(EmailRequest request) {
         log.info("sendEmail().start");
         var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() ->
-            new NotFoundException("Email not found"));
+                new NotFoundException("Email not found"));
 
         OneTimePassword otp = otpService.generateOTP(request.getEmail());
         user.setOtp(otp);
@@ -159,7 +159,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void forgetPassword(ForgetPasswordRequest request) {
         log.info("forgetPassword().start");
         var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() ->
-            new NotFoundException("Email not found"));
+                new NotFoundException("Email not found"));
 
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             throw new MismatchException(MISMATCH_EXCEPTION.getMessage());
