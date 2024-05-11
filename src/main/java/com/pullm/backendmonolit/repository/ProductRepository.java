@@ -5,15 +5,25 @@ import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.models.response.ChartResponse;
 import com.pullm.backendmonolit.models.response.ChartSingleResponse;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    @Query(
+            """
+                         SELECT p.productType
+                         FROM Product p 
+                         INNER JOIN p.transaction t
+                         WHERE t.user.id = :userId 
+                         GROUP BY p.productType
+                    """
+    )
+    List<String> getAllProductTypes(Long userId);
+
 
     @Query(
             """
@@ -25,7 +35,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                          GROUP BY p.productType
                     """
     )
-    List<ChartResponse> getAllChartResponse(LocalDateTime startDate, LocalDateTime endDate, Long userId);
+    List<ChartResponse> getAllChartResponse(LocalDate startDate, LocalDate endDate, Long userId);
 
 
     @Query(

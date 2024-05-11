@@ -1,6 +1,5 @@
 package com.pullm.backendmonolit.controllers;
 
-import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.enums.DateRange;
 import com.pullm.backendmonolit.models.response.StatisticsDetail;
 import com.pullm.backendmonolit.services.StatisticsService;
@@ -23,9 +22,8 @@ public class StatisticsController {
     @GetMapping("/overview")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public StatisticsDetail getAllChartResponse(@RequestParam DateRange dateRange,
-                                                @RequestParam ProductType productType) {
-        return statisticsService.getStatisticsDetail(dateRange, productType);
+    public StatisticsDetail getAllChartResponse(@RequestParam DateRange dateRange) {
+        return statisticsService.getStatisticsDetail(dateRange);
     }
 
 }

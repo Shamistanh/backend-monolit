@@ -5,13 +5,16 @@ import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.enums.DateRange;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.response.ChartSingleResponse;
+import com.pullm.backendmonolit.models.response.StatisticsCategory;
 import com.pullm.backendmonolit.models.response.StatisticsDetail;
 import com.pullm.backendmonolit.repository.ProductRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.StatisticsService;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,46 +31,118 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final UserRepository userRepository;
 
     @Override
-    public StatisticsDetail getStatisticsDetail(DateRange dateRange, ProductType productType) {
+    public StatisticsDetail getStatisticsDetail(DateRange dateRange) {
         StatisticsDetail statisticsDetail = null;
         switch (dateRange) {
-            case DAILY -> statisticsDetail = getDailyData(productType);
-            case MONTHLY -> statisticsDetail = getMonthlyData(productType);
-            case YEARLY -> statisticsDetail = getYearlyData(productType);
+            case DAILY -> statisticsDetail = getDailyData();
+            case MONTHLY -> statisticsDetail = getMonthlyData();
+            case YEARLY -> statisticsDetail = getYearlyData();
         }
         return statisticsDetail;
     }
 
-    private StatisticsDetail getYearlyData(ProductType productType) {
-        List<ChartSingleResponse> statisticsDetailsByYear =
-                productRepository.getStatisticsDetailsByYear(productType, getUser().getId());
+    private StatisticsDetail getYearlyData() {
+        StatisticsDetail statisticsDetail = StatisticsDetail.builder()
+                .statisticsCategories(
+                        productRepository.getAllProductTypes(getUser().getId()).stream().map(productType -> {
+                            List<ChartSingleResponse> statisticsDetailsByMonth =
+                                    productRepository.getStatisticsDetailsByYear(ProductType.valueOf(productType),
+                                            getUser().getId());
+                            return getStatisticsCategoryResponse(statisticsDetailsByMonth, productType);
+                        }).collect(Collectors.toList()))
+                .range(DateRange.YEARLY)
+                .build();
 
-        return getStatisticsResponse(statisticsDetailsByYear, DateRange.YEARLY);
+        statisticsDetail.setTotalAmount(statisticsDetail.getStatisticsCategories().stream().map(
+                        StatisticsCategory::getProductBasedTotalPrice)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        List<StatisticsCategory> statisticsCategories =
+                statisticsDetail.getStatisticsCategories().stream().map(category -> {
+                    category.setPercentage(
+                            category.getProductBasedTotalPrice()
+                                    .divide(statisticsDetail.getTotalAmount(), RoundingMode.HALF_UP)
+                                    .multiply(BigDecimal.valueOf(100)));
+                    return category;
+                }).collect(Collectors.toList());
+
+        statisticsDetail.setStatisticsCategories(statisticsCategories);
+        return statisticsDetail;
+
     }
 
-    private StatisticsDetail getMonthlyData(ProductType productType) {
-        List<ChartSingleResponse> statisticsDetailsByMonth =
-                productRepository.getStatisticsDetailsByMonth(productType, getUser().getId());
+    private StatisticsDetail getMonthlyData() {
+        StatisticsDetail statisticsDetail = StatisticsDetail.builder()
+                .statisticsCategories(
+                        productRepository.getAllProductTypes(getUser().getId()).stream().map(productType -> {
+                            List<ChartSingleResponse> statisticsDetailsByMonth =
+                                    productRepository.getStatisticsDetailsByMonth(ProductType.valueOf(productType),
+                                            getUser().getId());
+                            return getStatisticsCategoryResponse(statisticsDetailsByMonth, productType);
+                        }).collect(Collectors.toList()))
+                .range(DateRange.MONTHLY)
+                .build();
 
-        return getStatisticsResponse(statisticsDetailsByMonth, DateRange.MONTHLY);
+        statisticsDetail.setTotalAmount(statisticsDetail.getStatisticsCategories().stream().map(
+                        StatisticsCategory::getProductBasedTotalPrice)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        List<StatisticsCategory> statisticsCategories =
+                statisticsDetail.getStatisticsCategories().stream().map(category -> {
+                    category.setPercentage(
+                            category.getProductBasedTotalPrice()
+                                    .divide(statisticsDetail.getTotalAmount(), RoundingMode.HALF_UP)
+                                    .multiply(BigDecimal.valueOf(100)));
+                    return category;
+                }).collect(Collectors.toList());
+
+        statisticsDetail.setStatisticsCategories(statisticsCategories);
+        return statisticsDetail;
 
     }
 
-    private StatisticsDetail getDailyData(ProductType productType) {
-        List<ChartSingleResponse> statisticsDetailsByWeek =
-                productRepository.getStatisticsDetailsByDay(productType, getUser().getId());
+    private StatisticsDetail getDailyData() {
+        StatisticsDetail statisticsDetail = StatisticsDetail.builder()
+                .statisticsCategories(
+                        productRepository.getAllProductTypes(getUser().getId()).stream().map(productType -> {
+                            List<ChartSingleResponse> statisticsDetailsByMonth =
+                                    productRepository.getStatisticsDetailsByDay(ProductType.valueOf(productType),
+                                            getUser().getId());
+                            return getStatisticsCategoryResponse(statisticsDetailsByMonth, productType);
+                        }).collect(Collectors.toList()))
+                .range(DateRange.DAILY)
+                .build();
 
-        return getStatisticsResponse(statisticsDetailsByWeek, DateRange.DAILY);
+        statisticsDetail.setTotalAmount(statisticsDetail.getStatisticsCategories().stream().map(
+                        StatisticsCategory::getProductBasedTotalPrice)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        List<StatisticsCategory> statisticsCategories =
+                statisticsDetail.getStatisticsCategories().stream().map(category -> {
+                    category.setPercentage(
+                            category.getProductBasedTotalPrice()
+                                    .divide(statisticsDetail.getTotalAmount(), RoundingMode.HALF_UP)
+                                    .multiply(BigDecimal.valueOf(100)));
+                    return category;
+                }).collect(Collectors.toList());
+
+        statisticsDetail.setStatisticsCategories(statisticsCategories);
+        return statisticsDetail;
+
     }
 
-    private StatisticsDetail getStatisticsResponse(List<ChartSingleResponse> chartValues, DateRange dateRange) {
-        return StatisticsDetail.builder()
-                .chartDetails(chartValues)
-                .range(dateRange)
-                .totalPrice(chartValues.stream()
+    private StatisticsCategory getStatisticsCategoryResponse(List<ChartSingleResponse> chartValues,
+                                                             String productType) {
+        return StatisticsCategory.builder()
+                .productBasedTotalPrice(chartValues.stream()
                         .map(ChartSingleResponse::getAmount)
                         .filter(Objects::nonNull)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .chartDetails(chartValues)
+                .productType(productType)
                 .build();
     }
 

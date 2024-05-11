@@ -10,7 +10,7 @@ import lombok.Data;
 @Builder
 public class StatisticsDetail {
     private DateRange range;
-    private BigDecimal totalPrice;
-    private List<ChartSingleResponse> chartDetails;
+    private BigDecimal totalAmount;
+    private List<StatisticsCategory> statisticsCategories;
 
 }
