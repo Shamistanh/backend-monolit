@@ -58,15 +58,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
 
-        List<StatisticsCategory> statisticsCategories =
-                statisticsDetail.getStatisticsCategories().stream().map(category -> {
-                    category.setPercentage(
-                            category.getProductBasedTotalPrice()
-                                    .divide(statisticsDetail.getTotalAmount(), RoundingMode.HALF_UP)
-                                    .multiply(BigDecimal.valueOf(100)));
-                    return category;
-                }).collect(Collectors.toList());
-
+        List<StatisticsCategory> statisticsCategories = addPercentage(statisticsDetail);
         statisticsDetail.setStatisticsCategories(statisticsCategories);
         return statisticsDetail;
 
@@ -89,14 +81,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
 
-        List<StatisticsCategory> statisticsCategories =
-                statisticsDetail.getStatisticsCategories().stream().map(category -> {
-                    category.setPercentage(
-                            category.getProductBasedTotalPrice()
-                                    .divide(statisticsDetail.getTotalAmount(), RoundingMode.HALF_UP)
-                                    .multiply(BigDecimal.valueOf(100)));
-                    return category;
-                }).collect(Collectors.toList());
+        List<StatisticsCategory> statisticsCategories = addPercentage(statisticsDetail);
 
         statisticsDetail.setStatisticsCategories(statisticsCategories);
         return statisticsDetail;
@@ -120,18 +105,22 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
 
-        List<StatisticsCategory> statisticsCategories =
-                statisticsDetail.getStatisticsCategories().stream().map(category -> {
-                    category.setPercentage(
-                            category.getProductBasedTotalPrice()
-                                    .divide(statisticsDetail.getTotalAmount(), RoundingMode.HALF_UP)
-                                    .multiply(BigDecimal.valueOf(100)));
-                    return category;
-                }).collect(Collectors.toList());
+
+        List<StatisticsCategory> statisticsCategories = addPercentage(statisticsDetail);
 
         statisticsDetail.setStatisticsCategories(statisticsCategories);
         return statisticsDetail;
 
+    }
+
+    private List<StatisticsCategory> addPercentage(StatisticsDetail statisticsDetail) {
+        return statisticsDetail.getStatisticsCategories().stream().map(category -> {
+            category.setPercentage(
+                    category.getProductBasedTotalPrice()
+                            .divide(statisticsDetail.getTotalAmount(), RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(100)));
+            return category;
+        }).collect(Collectors.toList());
     }
 
     private StatisticsCategory getStatisticsCategoryResponse(List<ChartSingleResponse> chartValues,
