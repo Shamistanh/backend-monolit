@@ -34,5 +34,4 @@ public class FinanceController {
         return financeService.changeAmount(financialStatusRequest);
     }
 
-
 }

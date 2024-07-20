@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: create user goal table
+      author: Shamistan Huseynov
+      description: create user goal table to set goal
+      changes:
+        - createTable:
+            tableName: goal
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: goal
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_goal_user
