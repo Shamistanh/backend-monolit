@@ -13,7 +13,6 @@ import com.pullm.backendmonolit.services.FinanceService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -63,6 +62,18 @@ public class FinanceServiceImpl implements FinanceService {
             log.error("Error while adding income", e);
             return false;
         }
+    }
+
+    @Override
+    public Boolean deleteIncome(Long id) {
+        try {
+            userIncomeRepository.deleteByIdAndUser(id, getUser());
+            return true;
+        } catch (Exception e) {
+            log.error(e);
+            return false;
+        }
+
     }
 
 

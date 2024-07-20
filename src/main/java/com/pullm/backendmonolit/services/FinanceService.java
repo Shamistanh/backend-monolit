@@ -9,4 +9,6 @@ public interface FinanceService {
 
     Boolean addIncome(AddIncomeRequest addIncomeRequest);
 
+    Boolean deleteIncome(Long id);
+
 }
