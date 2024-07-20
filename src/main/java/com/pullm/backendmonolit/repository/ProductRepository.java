@@ -1,9 +1,12 @@
 package com.pullm.backendmonolit.repository;
 
 import com.pullm.backendmonolit.entities.Product;
+import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.models.response.ChartResponse;
 import com.pullm.backendmonolit.models.response.ChartSingleResponse;
+import com.pullm.backendmonolit.models.response.PopularProductResponse;
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -84,6 +87,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             """
     )
     List<ChartSingleResponse> getStatisticsDetailsByDay(ProductType productType, Long userId);
+
+    @Query("""
+        select new com.pullm.backendmonolit.models.response.PopularProductResponse(p.name, p.productType, count(p))
+        from Transaction t
+        join t.products p
+        where t.user = :user
+        group by p.name, p.productType
+        order by count(p) desc
+        """)
+    List<PopularProductResponse> getPopularProduct(User user, Pageable pageable);
+
 
 
 

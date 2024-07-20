@@ -5,11 +5,14 @@ import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.ProductRequest;
 import com.pullm.backendmonolit.models.response.ChartResponse;
+import com.pullm.backendmonolit.models.response.PopularProductResponse;
 import com.pullm.backendmonolit.repository.ProductRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -75,4 +78,10 @@ public class ProductServiceImpl {
                 .getPrincipal();
         return userDetails.getUsername();
     }
+
+    public List<PopularProductResponse> getPopularProducts(int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return productRepository.getPopularProduct(getUser(), pageable);
+    }
+
 }
