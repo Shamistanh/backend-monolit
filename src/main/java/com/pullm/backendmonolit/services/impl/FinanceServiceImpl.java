@@ -1,15 +1,18 @@
 package com.pullm.backendmonolit.services.impl;
 
+import com.pullm.backendmonolit.entities.Transaction;
 import com.pullm.backendmonolit.entities.User;
-import com.pullm.backendmonolit.entities.UserFinance;
-import com.pullm.backendmonolit.enums.FinancialType;
+import com.pullm.backendmonolit.entities.UserIncome;
 import com.pullm.backendmonolit.exception.NotFoundException;
-import com.pullm.backendmonolit.models.request.FinancialStatusRequest;
+import com.pullm.backendmonolit.models.request.AddIncomeRequest;
 import com.pullm.backendmonolit.models.response.FinancialStatusResponse;
-import com.pullm.backendmonolit.repository.UserFinancialConditionsRepository;
+import com.pullm.backendmonolit.repository.TransactionRepository;
+import com.pullm.backendmonolit.repository.UserIncomeRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.FinanceService;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,85 +27,62 @@ public class FinanceServiceImpl implements FinanceService {
 
     private final UserRepository userRepository;
 
-    private final UserFinancialConditionsRepository financialConditionsRepository;
+    private final TransactionRepository transactionRepository;
+
+    private final UserIncomeRepository userIncomeRepository;
 
     @Override
     public FinancialStatusResponse getFinancialCondition() {
-        User user = getUser();
-        Optional<UserFinance> byUserId = financialConditionsRepository.findByUserId(getUser().getId());
 
-        if (byUserId.isPresent()) {
-            UserFinance userFinance = byUserId.get();
-            return getFinancialStatusResponse(userFinance);
-        }
+        BigDecimal monthlyIncomeOfUser = findMonthlyIncomeOfUser();
+        BigDecimal monthlyExpenseOfUser = findMonthlyExpenseOfUser();
+        BigDecimal balance = monthlyIncomeOfUser.subtract(monthlyExpenseOfUser);
         return FinancialStatusResponse.builder()
-                .userId(user.getId())
-                .balance(BigDecimal.ZERO)
-                .monthlyIncome(BigDecimal.ZERO)
-                .monthlyExpense(BigDecimal.ZERO)
+                .userId(getUser().getId())
+                .balance(balance)
+                .monthlyIncome(monthlyIncomeOfUser)
+                .monthlyExpense(monthlyExpenseOfUser)
                 .build();
     }
 
     @Override
-    public Boolean changeAmount(FinancialStatusRequest financialStatusRequest) {
+    public Boolean addIncome(AddIncomeRequest addIncomeRequest) {
         try {
             User user = getUser();
-            Optional<UserFinance> financialConditionsOptional =
-                    financialConditionsRepository.findByUserId(user.getId());
 
-            if (financialConditionsOptional.isPresent()) {
-                UserFinance userFinance = financialConditionsOptional.get();
-                if (financialStatusRequest.getFinancialType() == FinancialType.INCOME) {
-                    userFinance.setMonthlyIncome(
-                            userFinance.getMonthlyIncome().add(financialStatusRequest.getAmount()));
-                    userFinance.setBalance(
-                            userFinance.getBalance().add(financialStatusRequest.getAmount()));
-                } else {
-                    userFinance.setMonthlyExpense(
-                            userFinance.getMonthlyExpense().add(financialStatusRequest.getAmount()));
-                    userFinance.setBalance(
-                            userFinance.getBalance().subtract(financialStatusRequest.getAmount()));
-                }
-                financialConditionsRepository.save(userFinance);
-                return true;
-            }
-
-            return initiateFinancialOvewview(financialStatusRequest, user);
+            userIncomeRepository.save(UserIncome.builder()
+                    .date(addIncomeRequest.getDate().atStartOfDay())
+                    .incomeType(addIncomeRequest.getIncomeType())
+                    .amount(addIncomeRequest.getAmount())
+                    .user(user)
+                    .build());
+            return true;
 
 
-        }catch (Exception e) {
-            log.error("Error while changing financial status", e);
+        } catch (Exception e) {
+            log.error("Error while adding income", e);
             return false;
         }
     }
 
-    private Boolean initiateFinancialOvewview(FinancialStatusRequest financialStatusRequest, User user) {
-        if (financialStatusRequest.getFinancialType() == FinancialType.INCOME) {
-            financialConditionsRepository.save(UserFinance.builder()
-                    .user(user)
-                    .balance(financialStatusRequest.getAmount())
-                    .monthlyExpense(BigDecimal.ZERO)
-                    .monthlyIncome(financialStatusRequest.getAmount())
-                    .build());
-        } else {
-            financialConditionsRepository.save(UserFinance.builder()
-                    .user(user)
-                    .monthlyExpense(financialStatusRequest.getAmount())
-                    .monthlyIncome(BigDecimal.ZERO)
-                    .balance(financialStatusRequest.getAmount().negate())
-                    .build());
-        }
 
+    private BigDecimal findMonthlyExpenseOfUser() {
+        LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
+        LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
+        return transactionRepository.findAllByUserIdAndDateBetween(getUser().getId(),
+                        startOfMonth, endOfMonth).stream().map(Transaction::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return true;
     }
 
-    private FinancialStatusResponse getFinancialStatusResponse(UserFinance userFinance) {
-        return FinancialStatusResponse.builder()
-                .balance(userFinance.getBalance())
-                .monthlyExpense(userFinance.getMonthlyExpense())
-                .monthlyIncome(userFinance.getMonthlyIncome())
-                .build();
+
+    private BigDecimal findMonthlyIncomeOfUser() {
+        LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
+        LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
+        return userIncomeRepository.findAllByUserIdAndDateBetween(getUser().getId(),
+                        startOfMonth, endOfMonth).stream().map(UserIncome::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
     }
 
     private User getUser() {

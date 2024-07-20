@@ -1,6 +1,6 @@
 package com.pullm.backendmonolit.controllers;
 
-import com.pullm.backendmonolit.models.request.FinancialStatusRequest;
+import com.pullm.backendmonolit.models.request.AddIncomeRequest;
 import com.pullm.backendmonolit.models.response.FinancialStatusResponse;
 import com.pullm.backendmonolit.services.FinanceService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,8 +30,8 @@ public class FinanceController {
     @PostMapping
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public Boolean changeFinanceOverview(@RequestBody FinancialStatusRequest financialStatusRequest) {
-        return financeService.changeAmount(financialStatusRequest);
+    public Boolean addIncome(@RequestBody AddIncomeRequest addIncomeRequest) {
+        return financeService.addIncome(addIncomeRequest);
     }
 
 }

@@ -3,6 +3,7 @@ package com.pullm.backendmonolit.services.impl;
 import com.pullm.backendmonolit.entities.Goal;
 import com.pullm.backendmonolit.entities.Transaction;
 import com.pullm.backendmonolit.entities.User;
+import com.pullm.backendmonolit.entities.UserIncome;
 import com.pullm.backendmonolit.enums.GoalStatus;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.request.GoalRequest;
@@ -10,13 +11,13 @@ import com.pullm.backendmonolit.models.response.GoalResponse;
 import com.pullm.backendmonolit.models.response.GoalSingleResponse;
 import com.pullm.backendmonolit.repository.GoalRepository;
 import com.pullm.backendmonolit.repository.TransactionRepository;
+import com.pullm.backendmonolit.repository.UserIncomeRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.GoalService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,8 @@ public class GoalServiceImpl implements GoalService {
 
     private final TransactionRepository transactionRepository;
 
+    private final UserIncomeRepository userIncomeRepository;
+
     @Override
     public GoalSingleResponse getGoal(Long id) {
         User user = getUser();
@@ -44,8 +47,7 @@ public class GoalServiceImpl implements GoalService {
 
         BigDecimal monthlyExpenseOfUser = findMonthlyExpenseOfUser();
 
-        //TODO will be changed after finance update
-        BigDecimal monthlyIncome = BigDecimal.valueOf(300);
+        BigDecimal monthlyIncome = findMonthlyIncomeOfUser();
         if (goalRepositoryById.isPresent()) {
 
             Goal goal = goalRepositoryById.get();
@@ -89,11 +91,9 @@ public class GoalServiceImpl implements GoalService {
 
         List<GoalSingleResponse> goalSingleResponses = new ArrayList<>();
         goals.forEach(goal -> {
+
             BigDecimal monthlyExpenseOfUser = findMonthlyExpenseOfUser();
-
-            //TODO will be changed after finance update
-            BigDecimal monthlyIncome = BigDecimal.valueOf(300);
-
+            BigDecimal monthlyIncome = findMonthlyIncomeOfUser();
             BigDecimal balance = monthlyIncome.subtract(monthlyExpenseOfUser);
 
             GoalSingleResponse goalSingleResponse = GoalSingleResponse.builder()
@@ -163,6 +163,15 @@ public class GoalServiceImpl implements GoalService {
         LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
         return transactionRepository.findAllByUserIdAndDateBetween(getUser().getId(),
                         startOfMonth, endOfMonth).stream().map(Transaction::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    }
+
+    private BigDecimal findMonthlyIncomeOfUser() {
+        LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
+        LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
+        return userIncomeRepository.findAllByUserIdAndDateBetween(getUser().getId(),
+                        startOfMonth, endOfMonth).stream().map(UserIncome::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     }

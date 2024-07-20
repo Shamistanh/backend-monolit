@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: create user income table
+      author: Shamistan Huseynov
+      description: create user income table to store income info
+      changes:
+        - createTable:
+            tableName: user_income
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: user_income
+                    references: users(id)
+              - column:
+                  name: amount
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: date
+              - column:
+                  name: income_type
+                  type: varchar(32)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValue: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  defaultValue: now()
+                  constraints:
+                    nullable: false
+              - addForeignKeyConstraint:
+                  baseTableName: user_income
+                  baseColumnNames: user_id
+                  referencedTableName: user
+                  referencedColumnNames: id
+                  constraintName: fk_user_income_user
