@@ -6,9 +6,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5455/postgresDB
+    url: jdbc:postgresql://postgresql-179164-0.cloudclusters.net:10035/postgresDB
     username: postgresUser
-    password: postgresPW
+    password: postgresPW97
 #    url: jdbc:h2:mem:pullm
 #    username: sa
 #    password: password
