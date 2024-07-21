@@ -14,6 +14,7 @@ import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.StatisticsService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,12 +34,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final UserRepository userRepository;
 
     @Override
-    public StatisticsDetail getStatisticsDetail(DateRange dateRange) {
+    public StatisticsDetail getStatisticsDetail(DateRange dateRange, LocalDateTime startDate, LocalDateTime endDate) {
         StatisticsDetail statisticsDetail = null;
         switch (dateRange) {
-            case DAILY -> statisticsDetail = getDailyData();
-            case MONTHLY -> statisticsDetail = getMonthlyData();
-            case YEARLY -> statisticsDetail = getYearlyData();
+            case DAILY -> statisticsDetail = getDailyData(startDate,endDate);
+            case MONTHLY -> statisticsDetail = getMonthlyData(startDate,endDate);
+            case YEARLY -> statisticsDetail = getYearlyData(startDate,endDate);
         }
         return statisticsDetail;
     }
@@ -48,10 +49,10 @@ public class StatisticsServiceImpl implements StatisticsService {
         return productRepository.findAllByProductTypeAndSubtype(productSubType,productType, getUser());
     }
 
-    private StatisticsDetail getYearlyData() {
+    private StatisticsDetail getYearlyData(LocalDateTime startDate, LocalDateTime endDate) {
         StatisticsDetail statisticsDetail = StatisticsDetail.builder()
                 .statisticsCategories(
-                        productRepository.getAllProductTypes(getUser().getId()).stream().map(productType -> {
+                        productRepository.getAllProductTypes(getUser().getId(), startDate, endDate).stream().map(productType -> {
                             List<ChartSingleResponse> statisticsDetailsByMonth =
                                     productRepository.getStatisticsDetailsByYear(ProductType.valueOf(productType),
                                             getUser().getId());
@@ -71,10 +72,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     }
 
-    private StatisticsDetail getMonthlyData() {
+    private StatisticsDetail getMonthlyData(LocalDateTime startDate, LocalDateTime endDate) {
         StatisticsDetail statisticsDetail = StatisticsDetail.builder()
                 .statisticsCategories(
-                        productRepository.getAllProductTypes(getUser().getId()).stream().map(productType -> {
+                        productRepository.getAllProductTypes(getUser().getId(), startDate, endDate).stream().map(productType -> {
                             List<ChartSingleResponse> statisticsDetailsByMonth =
                                     productRepository.getStatisticsDetailsByMonth(ProductType.valueOf(productType),
                                             getUser().getId());
@@ -95,10 +96,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     }
 
-    private StatisticsDetail getDailyData() {
+    private StatisticsDetail getDailyData(LocalDateTime startDate, LocalDateTime endDate) {
         StatisticsDetail statisticsDetail = StatisticsDetail.builder()
                 .statisticsCategories(
-                        productRepository.getAllProductTypes(getUser().getId()).stream().map(productType -> {
+                        productRepository.getAllProductTypes(getUser().getId(), startDate, endDate).stream().map(productType -> {
                             List<ChartSingleResponse> statisticsDetailsByMonth =
                                     productRepository.getStatisticsDetailsByDay(ProductType.valueOf(productType),
                                             getUser().getId());

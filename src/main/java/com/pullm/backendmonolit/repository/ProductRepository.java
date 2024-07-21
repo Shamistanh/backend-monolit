@@ -8,6 +8,7 @@ import com.pullm.backendmonolit.models.response.ChartResponse;
 import com.pullm.backendmonolit.models.response.ChartSingleResponse;
 import com.pullm.backendmonolit.models.response.PopularProductResponse;
 import com.pullm.backendmonolit.models.response.StatisticsProductResponse;
+import java.time.LocalDateTime;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,10 +25,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                          FROM Product p 
                          INNER JOIN p.transaction t
                          WHERE t.user.id = :userId 
+                         and t.date >= :startDate
+                         and t.date <= :endDate
                          GROUP BY p.productType
                     """
     )
-    List<String> getAllProductTypes(Long userId);
+    List<String> getAllProductTypes(Long userId, LocalDateTime startDate, LocalDateTime endDate);
 
 
     @Query(

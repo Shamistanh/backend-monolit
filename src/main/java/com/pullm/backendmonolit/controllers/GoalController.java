@@ -5,6 +5,7 @@ import com.pullm.backendmonolit.models.request.ChangeGoalStatusRequest;
 import com.pullm.backendmonolit.models.request.GoalRequest;
 import com.pullm.backendmonolit.models.response.GoalResponse;
 import com.pullm.backendmonolit.models.response.GoalSingleResponse;
+import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.services.GoalService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,9 @@ public class GoalController {
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public GoalSingleResponse getGoal(@PathVariable("id") Long id) {
-        return goalService.getGoal(id);
+    public ResponseDTO<GoalSingleResponse> getGoal(@PathVariable("id") Long id) {
+        return ResponseDTO.<GoalSingleResponse>builder()
+                .data(goalService.getGoal(id)).build();
     }
 
     @PostMapping

@@ -3,10 +3,13 @@ package com.pullm.backendmonolit.controllers;
 import com.pullm.backendmonolit.entities.enums.ProductSubType;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.enums.DateRange;
+import com.pullm.backendmonolit.models.response.GoalSingleResponse;
+import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.models.response.StatisticsDetail;
 import com.pullm.backendmonolit.models.response.StatisticsProductResponse;
 import com.pullm.backendmonolit.services.StatisticsService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,16 +29,20 @@ public class StatisticsController {
     @GetMapping("/overview")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public StatisticsDetail getAllChartResponse(@RequestParam DateRange dateRange) {
-        return statisticsService.getStatisticsDetail(dateRange);
+    public ResponseDTO<StatisticsDetail> getAllChartResponse(@RequestParam DateRange dateRange,
+                                                             @RequestParam(required = false) LocalDateTime startDate,
+                                                             @RequestParam(required = false) LocalDateTime endDate) {
+        return ResponseDTO.<StatisticsDetail>builder().data(statisticsService.getStatisticsDetail(dateRange,
+                startDate,endDate)).build();
     }
 
     @GetMapping("/products")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public List<StatisticsProductResponse> getProducts(@RequestParam(required = false) ProductSubType productSubType, @RequestParam
+    public ResponseDTO<List<StatisticsProductResponse>> getProducts(@RequestParam(required = false) ProductSubType productSubType, @RequestParam
     ProductType productType) {
-        return statisticsService.getProductDetails(productSubType, productType);
+        return ResponseDTO.<List<StatisticsProductResponse>>builder().data(statisticsService.getProductDetails(productSubType,
+                productType)).build();
     }
 
 }
