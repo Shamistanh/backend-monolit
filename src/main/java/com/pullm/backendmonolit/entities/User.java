@@ -45,6 +45,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private Boolean isEnabled;
+    private String currency;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserDetail detail;

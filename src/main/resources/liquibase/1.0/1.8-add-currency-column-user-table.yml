@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add currency column
+      author: Shamistan Huseynov
+      description: add currency column to usr table
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: currency
+                  type: varchar(256)

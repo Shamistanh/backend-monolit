@@ -35,6 +35,9 @@ dependencies {
             'org.springframework.boot:spring-boot-starter-mail',
             'org.springframework.boot:spring-boot-starter-thymeleaf'
     )
+//      Feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
 
 //    JWT
     implementation(
