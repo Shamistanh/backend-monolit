@@ -58,6 +58,7 @@ public class ResponseCaptureFilter implements Filter {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                chain.doFilter(request, response);
 
             }
 
