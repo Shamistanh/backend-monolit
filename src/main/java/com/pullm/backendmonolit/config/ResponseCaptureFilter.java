@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
@@ -42,22 +43,26 @@ public class ResponseCaptureFilter implements Filter {
 
 
             try {
-                Object responseBody = objectMapper.readValue(responseContent, Object.class);
+                HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+                if (!httpServletRequest.getRequestURI().contains("swagger")) {
+                    Object responseBody = objectMapper.readValue(responseContent, Object.class);
 
-                if (responseBody instanceof Map) {
-                    Map<String, Object> responseBodyMap = (Map<String, Object>) responseBody;
-                    processAmounts(responseBodyMap);
-                    modifiedResponseBody = objectMapper.writeValueAsString(responseBodyMap);
-                } else if (responseBody instanceof List) {
-                    List<Object> responseBodyList = (List<Object>) responseBody;
-                    processAmounts(responseBodyList);
-                    modifiedResponseBody = objectMapper.writeValueAsString(responseBodyList);
-                } else {
-                    // Handle unexpected response type
-                    System.out.println("Unexpected response type: " + responseBody.getClass().getName());
+                    if (responseBody instanceof Map) {
+                        Map<String, Object> responseBodyMap = (Map<String, Object>) responseBody;
+                        processAmounts(responseBodyMap);
+                        modifiedResponseBody = objectMapper.writeValueAsString(responseBodyMap);
+                    } else if (responseBody instanceof List) {
+                        List<Object> responseBodyList = (List<Object>) responseBody;
+                        processAmounts(responseBodyList);
+                        modifiedResponseBody = objectMapper.writeValueAsString(responseBodyList);
+                    } else {
+                        System.out.println("Unexpected response type: " + responseBody.getClass().getName());
+                    }
+                }else{
+                    chain.doFilter(request, response);
+                    return;
                 }
             } catch (IOException e) {
-                chain.doFilter(request, response);
                 return;
             }
 
