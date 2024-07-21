@@ -1,11 +1,16 @@
 package com.pullm.backendmonolit.services.impl;
 
+import com.pullm.backendmonolit.client.CountryClient;
 import com.pullm.backendmonolit.client.ExchangeRateClient;
 import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.request.CurrencyRequest;
+import com.pullm.backendmonolit.models.response.CurrencyResponse;
+import com.pullm.backendmonolit.models.response.ExchangeRateResponse;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.ConversionService;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +25,8 @@ public class ConversionServiceImpl implements ConversionService {
 
     private final ExchangeRateClient exchangeRateClient;
 
+    private final CountryClient countryClient;
+
     private final UserRepository userRepository;
 
     private static String AZN = "AZN";
@@ -30,8 +37,23 @@ public class ConversionServiceImpl implements ConversionService {
         return amount * rate;
     }
 
-    public Set<String> getAvailableCurrencies() {
-        return exchangeRateClient.getExchangeRates().getRates().keySet();
+    public List<CurrencyResponse> getAvailableCurrencies() {
+        List<CurrencyResponse> currencies = new ArrayList<>();
+        exchangeRateClient.getExchangeRates().getRates().forEach((k, v) -> currencies.add(CurrencyResponse.builder()
+                        .flag(getCountryFlag(k))
+                .currencyCode(k)
+                .rate(v)
+                .build()));
+        return currencies;
+    }
+
+    private String getCountryFlag(String k) {
+        try {
+            return countryClient.getCountry(k).get(0).getFlags().getPng();
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
     }
 
     public Boolean setCurrency(CurrencyRequest currencyRequest) {

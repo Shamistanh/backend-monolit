@@ -1,9 +1,11 @@
 package com.pullm.backendmonolit.controllers;
 
 import com.pullm.backendmonolit.models.request.CurrencyRequest;
+import com.pullm.backendmonolit.models.response.CurrencyResponse;
 import com.pullm.backendmonolit.services.ConversionService;
 import com.pullm.backendmonolit.services.impl.ConversionServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +26,7 @@ public class CurrencyController {
     @GetMapping("/all")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public Set<String> getAvailableCurrencies() {
+    public List<CurrencyResponse> getAvailableCurrencies() {
         return conversionService.getAvailableCurrencies();
     }
 
