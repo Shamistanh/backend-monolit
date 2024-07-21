@@ -5,6 +5,7 @@ import com.pullm.backendmonolit.models.request.AuthenticationRequest;
 import com.pullm.backendmonolit.models.request.EmailRequest;
 import com.pullm.backendmonolit.models.request.ForgetPasswordRequest;
 import com.pullm.backendmonolit.models.request.RegisterRequest;
+import com.pullm.backendmonolit.models.request.VerifyOtpRequest;
 import com.pullm.backendmonolit.models.response.AuthenticationResponse;
 
 public interface AuthenticationService {
@@ -18,4 +19,7 @@ public interface AuthenticationService {
     void sendEmail(EmailRequest request);
 
     void forgetPassword(ForgetPasswordRequest request);
+
+    boolean verifyOtp(VerifyOtpRequest request);
+
 }

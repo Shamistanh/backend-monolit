@@ -6,6 +6,7 @@ import com.pullm.backendmonolit.models.request.AuthenticationRequest;
 import com.pullm.backendmonolit.models.request.EmailRequest;
 import com.pullm.backendmonolit.models.request.ForgetPasswordRequest;
 import com.pullm.backendmonolit.models.request.RegisterRequest;
+import com.pullm.backendmonolit.models.request.VerifyOtpRequest;
 import com.pullm.backendmonolit.models.response.AuthenticationResponse;
 import com.pullm.backendmonolit.services.AuthenticationService;
 import jakarta.validation.Valid;
@@ -46,6 +47,12 @@ public class AuthenticationController {
     @ResponseStatus(code = HttpStatus.OK)
     public void sendEmail(@RequestBody @Valid EmailRequest request) {
         authenticationService.sendEmail(request);
+    }
+
+    @PostMapping("/verify-otp")
+    @ResponseStatus(code = HttpStatus.OK)
+    public boolean verifyOtp(@RequestBody @Valid VerifyOtpRequest request) {
+        return authenticationService.verifyOtp(request);
     }
 
     @PostMapping("/reset-password")

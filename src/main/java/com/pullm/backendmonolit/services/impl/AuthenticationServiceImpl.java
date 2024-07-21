@@ -15,6 +15,7 @@ import com.pullm.backendmonolit.models.request.AuthenticationRequest;
 import com.pullm.backendmonolit.models.request.EmailRequest;
 import com.pullm.backendmonolit.models.request.ForgetPasswordRequest;
 import com.pullm.backendmonolit.models.request.RegisterRequest;
+import com.pullm.backendmonolit.models.request.VerifyOtpRequest;
 import com.pullm.backendmonolit.models.response.AuthenticationResponse;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.security.jwt.JWTUtil;
@@ -178,6 +179,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         log.info("forgetPassword().end");
+    }
+
+    @Override
+    public boolean verifyOtp(VerifyOtpRequest request) {
+        var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() ->
+                new NotFoundException("Email not found"));
+
+        if (user.getOtp().getExpiredAt().isBefore(Instant.now())) {
+            log.error("Otp expired for user-id: {}", user.getId());
+            throw new OtpException("Otp expired");
+        }
+
+        if (!request.getOtp().equals(user.getOtp().getPassword())) {
+            log.error("Invalid otp for user-id: {}", user.getId());
+            throw new OtpException("Invalid otp");
+        }
+        return true;
     }
 
 }
