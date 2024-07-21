@@ -1,12 +1,14 @@
 package com.pullm.backendmonolit.services.impl;
 
 import com.pullm.backendmonolit.entities.User;
+import com.pullm.backendmonolit.entities.enums.ProductSubType;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.enums.DateRange;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.response.ChartSingleResponse;
 import com.pullm.backendmonolit.models.response.StatisticsCategory;
 import com.pullm.backendmonolit.models.response.StatisticsDetail;
+import com.pullm.backendmonolit.models.response.StatisticsProductResponse;
 import com.pullm.backendmonolit.repository.ProductRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.StatisticsService;
@@ -39,6 +41,11 @@ public class StatisticsServiceImpl implements StatisticsService {
             case YEARLY -> statisticsDetail = getYearlyData();
         }
         return statisticsDetail;
+    }
+
+    @Override
+    public List<StatisticsProductResponse> getProductDetails(ProductSubType productSubType, ProductType productType) {
+        return productRepository.findAllByProductTypeAndSubtype(productSubType,productType, getUser());
     }
 
     private StatisticsDetail getYearlyData() {

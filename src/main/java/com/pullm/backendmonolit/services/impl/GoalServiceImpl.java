@@ -6,6 +6,7 @@ import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.entities.UserIncome;
 import com.pullm.backendmonolit.enums.GoalStatus;
 import com.pullm.backendmonolit.exception.NotFoundException;
+import com.pullm.backendmonolit.models.request.ChangeGoalStatusRequest;
 import com.pullm.backendmonolit.models.request.GoalRequest;
 import com.pullm.backendmonolit.models.response.GoalResponse;
 import com.pullm.backendmonolit.models.response.GoalSingleResponse;
@@ -125,24 +126,14 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public Boolean createGoal(GoalRequest goalRequest) {
         User user = getUser();
-        Goal goal = Goal.builder()
+        goalRepository.save(Goal.builder()
                 .user(user)
-                .startDate(goalRequest.getGoalStateDate())
+                .startDate(LocalDate.now())
                 .endDate(goalRequest.getGoalEndDate())
                 .name(goalRequest.getGoalName())
                 .amount(goalRequest.getAmount())
                 .status(GoalStatus.PENDING)
-                .build();
-        if (goalRequest.getGoalStateDate().isBefore(LocalDate.now()) &&
-                goalRequest.getGoalEndDate().isAfter(LocalDate.now())
-        ) {
-            goal.setStatus(GoalStatus.ACTIVE);
-        } else if (goalRequest.getGoalStateDate().isBefore(LocalDate.now()) &&
-                goalRequest.getGoalEndDate().isBefore(LocalDate.now())) {
-            goal.setStatus(GoalStatus.COMPLETED);
-        }
-
-        goalRepository.save(goal);
+                .build());
         return true;
     }
 
@@ -156,6 +147,24 @@ public class GoalServiceImpl implements GoalService {
             return false;
         }
 
+    }
+
+    @Override
+    public Boolean changeGoalStatus(ChangeGoalStatusRequest changeGoalStatusRequest) {
+        try {
+            Optional<Goal> goalOptional =
+                    goalRepository.findByIdAndUser(changeGoalStatusRequest.getGoalId(), getUser());
+            if (goalOptional.isPresent()) {
+                Goal goal = goalOptional.get();
+                goal.setStatus(changeGoalStatusRequest.getStatus());
+                goalRepository.save(goal);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            log.error(e);
+            return false;
+        }
     }
 
     private BigDecimal findMonthlyExpenseOfUser() {

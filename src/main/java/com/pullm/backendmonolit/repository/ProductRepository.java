@@ -2,10 +2,12 @@ package com.pullm.backendmonolit.repository;
 
 import com.pullm.backendmonolit.entities.Product;
 import com.pullm.backendmonolit.entities.User;
+import com.pullm.backendmonolit.entities.enums.ProductSubType;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.models.response.ChartResponse;
 import com.pullm.backendmonolit.models.response.ChartSingleResponse;
 import com.pullm.backendmonolit.models.response.PopularProductResponse;
+import com.pullm.backendmonolit.models.response.StatisticsProductResponse;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
@@ -98,6 +100,30 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         """)
     List<PopularProductResponse> getPopularProduct(User user, Pageable pageable);
 
+
+    @Query("""
+                    SELECT new com.pullm.backendmonolit.models.response.StatisticsProductResponse(
+                    t.date,
+                p.name,
+                p.price,
+                p.count,
+                p.productSubType)
+                    FROM
+                Transaction t
+                    RIGHT JOIN
+                Product p
+            ON
+                t.id = p.transaction.id
+                    WHERE
+                t.user = :user
+                AND p.productType = :productType
+                AND (p.productSubType = :productSubType OR :productSubType IS NULL OR :productSubType = '')
+                    ORDER BY
+                t.date
+                
+            """)
+    List<StatisticsProductResponse> findAllByProductTypeAndSubtype(ProductSubType productSubType,
+                                                                   ProductType productType, User user);
 
 
 

@@ -1,6 +1,7 @@
 package com.pullm.backendmonolit.controllers;
 
 import com.pullm.backendmonolit.enums.GoalStatus;
+import com.pullm.backendmonolit.models.request.ChangeGoalStatusRequest;
 import com.pullm.backendmonolit.models.request.GoalRequest;
 import com.pullm.backendmonolit.models.response.GoalResponse;
 import com.pullm.backendmonolit.models.response.GoalSingleResponse;
@@ -52,6 +53,14 @@ public class GoalController {
     public Boolean createGoal(@RequestBody GoalRequest goalRequest) {
         return goalService.createGoal(goalRequest);
     }
+
+    @PutMapping("status-update")
+    @ResponseStatus(code = HttpStatus.OK)
+    @SecurityRequirement(name = "Bearer Authentication")
+    public Boolean changeGoalStatus(@RequestBody ChangeGoalStatusRequest changeGoalStatusRequest) {
+        return goalService.changeGoalStatus(changeGoalStatusRequest);
+    }
+
 
     @DeleteMapping("{id}")
     @ResponseStatus(code = HttpStatus.OK)
