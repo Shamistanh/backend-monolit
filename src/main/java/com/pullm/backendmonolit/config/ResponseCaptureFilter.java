@@ -57,9 +57,8 @@ public class ResponseCaptureFilter implements Filter {
                     System.out.println("Unexpected response type: " + responseBody.getClass().getName());
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                chain.doFilter(request, response);
                 return;
-
             }
 
 
