@@ -9,6 +9,7 @@ import com.pullm.backendmonolit.models.response.CurrencyResponse;
 import com.pullm.backendmonolit.models.response.ExchangeRateResponse;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.ConversionService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -29,11 +30,14 @@ public class ConversionServiceImpl implements ConversionService {
 
     private final UserRepository userRepository;
 
-    private static String AZN = "AZN";
+    private final HttpServletRequest request;
+
+    private static final String AZN = "AZN";
+
+    private static final String ACCEPT_CURRENCY = "accept-currency";
 
     public double convertAmount(double amount) {
-        Double rate = exchangeRateClient.getExchangeRates().getRates().get(getUser().getCurrency() == null ? AZN :
-                getUser().getCurrency());
+        Double rate = exchangeRateClient.getExchangeRates().getRates().get(getCurrency());
         return amount * rate;
     }
 
@@ -53,6 +57,15 @@ public class ConversionServiceImpl implements ConversionService {
         }catch (Exception e) {
             log.error(e.getMessage());
             return null;
+        }
+    }
+
+    private String getCurrency() {
+        try {
+            return request.getHeader(ACCEPT_CURRENCY);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return AZN;
         }
     }
 
