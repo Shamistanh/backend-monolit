@@ -12,6 +12,7 @@ import lombok.Setter;
 public class StatisticsCategory {
     private String productType;
     private BigDecimal productBasedTotalPrice;
+    private String color;
     private BigDecimal percentage;
     private List<ChartSingleResponse> chartDetails;
 

@@ -140,6 +140,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .chartDetails(chartValues)
                 .productType(productType)
+                .color(ProductType.valueOf(productType).getColor())
                 .build();
     }
 

@@ -56,6 +56,9 @@ public class Constants {
             OTHERS, List.of(TAXES, INSURANCE, PENALTY, CHARITY, INVESTMENT, BANKING)
     );
 
+    public static List<ProductSubType> findProductTypeByType(ProductType productType) {
+        return TYPES_TO_SUB_TYPES.get(productType);
+    }
 
     public static ProductType findProductTypeBySubType(ProductSubType subType) {
         return TYPES_TO_SUB_TYPES.entrySet()

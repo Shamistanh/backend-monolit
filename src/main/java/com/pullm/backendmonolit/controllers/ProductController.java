@@ -1,5 +1,7 @@
 package com.pullm.backendmonolit.controllers;
 
+import com.pullm.backendmonolit.entities.enums.ProductSubType;
+import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.ProductRequest;
 import com.pullm.backendmonolit.models.response.ChartResponse;
@@ -39,6 +41,14 @@ public class ProductController {
     public ResponseDTO<List<PopularProductResponse>> getPopularProducts(@PathVariable("limit") int limit) {
         return ResponseDTO.<List<PopularProductResponse>>builder()
                 .data(productService.getPopularProducts(limit)).build();
+    }
+
+    @GetMapping("/subtypes/{productTpe}")
+    @ResponseStatus(code = HttpStatus.OK)
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseDTO<List<ProductSubType>> getProductSubtypes(@PathVariable("productTpe") ProductType productType) {
+        return ResponseDTO.<List<ProductSubType>>builder()
+                .data(productService.getProductSubType(productType)).build();
     }
 
     @PostMapping

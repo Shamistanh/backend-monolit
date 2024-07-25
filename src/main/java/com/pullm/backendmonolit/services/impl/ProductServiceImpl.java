@@ -1,6 +1,9 @@
 package com.pullm.backendmonolit.services.impl;
 
+import com.pullm.backendmonolit.consatnts.Constants;
 import com.pullm.backendmonolit.entities.User;
+import com.pullm.backendmonolit.entities.enums.ProductSubType;
+import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.ProductRequest;
@@ -82,6 +85,10 @@ public class ProductServiceImpl {
     public List<PopularProductResponse> getPopularProducts(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
         return productRepository.getPopularProduct(getUser(), pageable);
+    }
+
+    public List<ProductSubType> getProductSubType(ProductType productType) {
+        return Constants.findProductTypeByType(productType);
     }
 
 }

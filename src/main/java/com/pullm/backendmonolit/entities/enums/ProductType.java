@@ -4,17 +4,20 @@ import lombok.Getter;
 
 @Getter
 public enum ProductType {
-    FOOD_AND_BEVERAGES("Food and beverages"),
-    SHOPPING("Shopping"),
-    LIFE_AND_ENTERTAINMENT("Life and entertainment"),
-    HOUSING_AND_VEHICLE("Housing and vehicle"),
-    TRANSPORT("Transport"),
-    OTHERS("Others");
+    FOOD_AND_BEVERAGES("Food and beverages", "#5EFF33"),
+    SHOPPING("Shopping", "#FF33FF"),
+    LIFE_AND_ENTERTAINMENT("Life and entertainment", "#33B5FF"),
+    HOUSING_AND_VEHICLE("Housing and vehicle", "#FF3333"),
+    TRANSPORT("Transport", "#FF3333"),
+    OTHERS("Others", "#8C8B88");
 
     private final String value;
 
-    ProductType(String value) {
+    private final String color;
+
+    ProductType(String value, String color) {
         this.value = value;
+        this.color = color;
     }
 
 }
