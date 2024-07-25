@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add rate column
+      author: Shamistan Huseynov
+      description: adding rates of currencies to transaction table
+      changes:
+        - addColumn:
+            tableName: transactions
+            columns:
+              - column:
+                  name: rate
+                  type: decimal(10, 2)

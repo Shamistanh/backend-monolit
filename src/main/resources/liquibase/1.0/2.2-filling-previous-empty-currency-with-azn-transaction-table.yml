@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill currency column
+      author: Shamistan Huseynov
+      description: Updating currency column with default value of azn for existing records
+      changes:
+        - update:
+            tableName: transactions
+            columns:
+              - column:
+                  name: currency
+                  value: AZN

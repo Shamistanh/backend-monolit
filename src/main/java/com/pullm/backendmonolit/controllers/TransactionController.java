@@ -2,6 +2,7 @@ package com.pullm.backendmonolit.controllers;
 
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.TransactionRequest;
+import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.models.response.TransactionResponse;
 import com.pullm.backendmonolit.services.impl.TransactionsServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -41,7 +42,8 @@ public class TransactionController {
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public List<TransactionResponse> getAllTransactions(DateCriteria dateCriteria) {
-        return transactionsService.getAllTransactions(dateCriteria);
+    public ResponseDTO<List<TransactionResponse>> getAllTransactions(DateCriteria dateCriteria) {
+        return ResponseDTO.<List<TransactionResponse>>builder()
+                .data(transactionsService.getAllTransactions(dateCriteria)).build();
     }
 }

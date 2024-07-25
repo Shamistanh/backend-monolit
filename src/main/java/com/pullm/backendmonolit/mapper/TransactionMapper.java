@@ -42,7 +42,8 @@ public interface TransactionMapper {
                                 transactionDetailsResponse.setStoreName(storeName);
 
                                 var totalAmount = storeTransactions.stream()
-                                        .map(Transaction::getTotalAmount)
+                                        .map(transaction -> transaction.getTotalAmount().multiply(
+                                                BigDecimal.valueOf(transaction.getRate())))
                                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                                 transactionDetailsResponse.setTotalPrice(totalAmount);
 
@@ -52,15 +53,19 @@ public interface TransactionMapper {
 
                                 transactionDetailsResponse.setProductCount(productCount);
 
-                                storeTransactions.stream().findAny().ifPresent(transaction ->
-                                        transactionDetailsResponse.setDateTime(transaction.getDate()));
+                                storeTransactions.stream().findAny().ifPresent(transaction -> {
+                                            transactionDetailsResponse.setDateTime(transaction.getDate());
+                                            transactionDetailsResponse.setCurrency(transaction.getCurrency());
+                                        }
+                                );
 
                                 var productRequests = storeTransactions.stream()
                                         .flatMap(transaction -> transaction.getProducts().stream())
                                         .map(product -> {
                                             var productResponse = new ProductResponse();
                                             productResponse.setName(product.getName());
-                                            productResponse.setPrice(product.getPrice());
+                                            productResponse.setPrice(product.getPrice().multiply(
+                                                    BigDecimal.valueOf(product.getTransaction().getRate())));
                                             productResponse.setQuantity(
                                                     getQuantity(product.getWeight(), product.getCount()));
                                             return productResponse;

@@ -10,11 +10,14 @@ import com.pullm.backendmonolit.models.response.ExchangeRateResponse;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.ConversionService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -38,7 +41,9 @@ public class ConversionServiceImpl implements ConversionService {
 
     public double convertAmount(double amount) {
         Double rate = exchangeRateClient.getExchangeRates().getRates().get(getCurrency());
-        return amount * rate;
+        BigDecimal bd = new BigDecimal(Double.toString(rate * amount));
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     public List<CurrencyResponse> getAvailableCurrencies() {
@@ -62,7 +67,7 @@ public class ConversionServiceImpl implements ConversionService {
 
     private String getCurrency() {
         try {
-            return request.getHeader(ACCEPT_CURRENCY);
+            return request.getHeader(ACCEPT_CURRENCY) == null ? AZN :  request.getHeader(ACCEPT_CURRENCY);
         } catch (Exception e) {
             log.error(e.getMessage());
             return AZN;
@@ -74,6 +79,11 @@ public class ConversionServiceImpl implements ConversionService {
         user.setCurrency(currencyRequest.getCurrency());
         userRepository.save(user);
         return true;
+    }
+
+    @Override
+    public Pair<String, Double> getCurrentCurrency() {
+        return Pair.of(getCurrency(), exchangeRateClient.getExchangeRates().getRates().get(getCurrency()));
     }
 
     private User getUser() {

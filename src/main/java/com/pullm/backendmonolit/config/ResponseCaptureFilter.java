@@ -86,9 +86,9 @@ public class ResponseCaptureFilter implements Filter {
                     }
                 }
             } else if ("amount".equals(entry.getKey()) && entry.getValue() instanceof Number
-            || "balance".equals(entry.getKey()) && entry.getValue() instanceof Number
-            || "monthlyTotalExpenses".equals(entry.getKey()) && entry.getValue() instanceof Number
-            || "monthlyIncome".equals(entry.getKey()) && entry.getValue() instanceof Number) {
+                    || "balance".equals(entry.getKey()) && entry.getValue() instanceof Number
+                    || "monthlyTotalExpenses".equals(entry.getKey()) && entry.getValue() instanceof Number
+                    || "monthlyIncome".equals(entry.getKey()) && entry.getValue() instanceof Number) {
                 double originalAmount = ((Number) entry.getValue()).doubleValue();
                 double convertedAmount = conversionService.convertAmount(originalAmount);
                 entry.setValue(convertedAmount);

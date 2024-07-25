@@ -18,6 +18,7 @@ public class TransactionDetailsResponse {
     private String storeName;
     private BigDecimal totalPrice;
     private Integer productCount;
+    private String currency;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateTime;
     private List<ProductResponse> products;

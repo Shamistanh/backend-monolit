@@ -30,15 +30,17 @@ public class GoalController {
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public GoalSingleResponse getGoalById(Long id) {
-        return goalService.getGoal(id);
+    public ResponseDTO<GoalSingleResponse> getGoalById(Long id) {
+        return ResponseDTO.<GoalSingleResponse>builder()
+                .data(goalService.getGoal(id)).build();
     }
 
     @GetMapping("/all/{status}")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public GoalResponse getGoalByStatus(@PathVariable("status") GoalStatus status) {
-        return goalService.getAllGoals(status);
+    public ResponseDTO<GoalResponse> getGoalByStatus(@PathVariable("status") GoalStatus status) {
+        return ResponseDTO.<GoalResponse>builder()
+                .data(goalService.getAllGoals(status)).build();
     }
 
     @GetMapping("/{id}")
@@ -52,23 +54,26 @@ public class GoalController {
     @PostMapping
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public Boolean createGoal(@RequestBody GoalRequest goalRequest) {
-        return goalService.createGoal(goalRequest);
+    public ResponseDTO<Boolean> createGoal(@RequestBody GoalRequest goalRequest) {
+        return ResponseDTO.<Boolean>builder()
+                .data(goalService.createGoal(goalRequest)).build();
     }
 
     @PutMapping("status-update")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public Boolean changeGoalStatus(@RequestBody ChangeGoalStatusRequest changeGoalStatusRequest) {
-        return goalService.changeGoalStatus(changeGoalStatusRequest);
+    public ResponseDTO<Boolean> changeGoalStatus(@RequestBody ChangeGoalStatusRequest changeGoalStatusRequest) {
+        return ResponseDTO.<Boolean>builder()
+                .data(goalService.changeGoalStatus(changeGoalStatusRequest)).build();
     }
 
 
     @DeleteMapping("{id}")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public Boolean deleteGoal(@PathVariable("id") Long id) {
-        return goalService.deleteGoal(id);
+    public ResponseDTO<Boolean> deleteGoal(@PathVariable("id") Long id) {
+        return ResponseDTO.<Boolean>builder()
+                .data(goalService.deleteGoal(id)).build();
     }
 
 

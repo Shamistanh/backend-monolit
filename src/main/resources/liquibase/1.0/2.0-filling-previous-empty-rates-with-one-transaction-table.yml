@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: fill rate column
+      author: Shamistan Huseynov
+      description: Updating rate column with default value of 1 for existing records
+      changes:
+        - update:
+            tableName: transactions
+            columns:
+              - column:
+                  name: rate
+                  value: 1

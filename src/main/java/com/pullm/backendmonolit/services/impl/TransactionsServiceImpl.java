@@ -13,13 +13,15 @@ import com.pullm.backendmonolit.models.request.TransactionRequest;
 import com.pullm.backendmonolit.models.response.TransactionResponse;
 import com.pullm.backendmonolit.repository.TransactionRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
+import com.pullm.backendmonolit.services.ConversionService;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.util.Pair;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class TransactionsServiceImpl {
     private final TransactionMapper transactionMapper = TransactionMapper.INSTANCE;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final ConversionService conversionService;
 
     @Transactional(isolation = Isolation.DEFAULT)
     public void createTransaction(TransactionRequest transactionRequest) {
@@ -47,14 +50,20 @@ public class TransactionsServiceImpl {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        Pair<String, Double> currentCurrency = conversionService.getCurrentCurrency();
         var user = getUser();
         transaction.setUser(user);
         transaction.setTransactionType(TransactionType.MANUAL);
-        transaction.setTotalAmount(totalAmount);
+        transaction.setTotalAmount(
+                totalAmount.divide(BigDecimal.valueOf(currentCurrency.getSecond()), RoundingMode.HALF_UP));
+        transaction.setRate(currentCurrency.getSecond());
+        transaction.setCurrency(currentCurrency.getFirst());
 
         transaction.getProducts().forEach(product -> {
             ProductType productType = findProductTypeBySubType(product.getProductSubType());
             product.setProductType(productType);
+            product.setPrice(
+                    product.getPrice().divide(BigDecimal.valueOf(currentCurrency.getSecond()), RoundingMode.HALF_UP));
             product.setTransaction(transaction);
         });
 

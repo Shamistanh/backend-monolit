@@ -41,6 +41,8 @@ public class Transaction {
     private Long id;
     private String storeName;
     private BigDecimal totalAmount;
+    private Double rate;
+    private String currency;
     private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)

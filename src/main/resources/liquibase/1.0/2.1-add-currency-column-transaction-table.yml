@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add currency column
+      author: Shamistan Huseynov
+      description: adding currency to transaction table
+      changes:
+        - addColumn:
+            tableName: transactions
+            columns:
+              - column:
+                  name: currency
+                  type: varchar(256)
