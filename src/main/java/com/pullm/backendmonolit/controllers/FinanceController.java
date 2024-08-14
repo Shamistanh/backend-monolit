@@ -2,6 +2,7 @@ package com.pullm.backendmonolit.controllers;
 
 import com.pullm.backendmonolit.models.request.AddIncomeRequest;
 import com.pullm.backendmonolit.models.response.FinancialStatusResponse;
+import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.services.FinanceService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -25,22 +26,25 @@ public class FinanceController {
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public FinancialStatusResponse getFinanceOverview() {
-        return financeService.getFinancialCondition();
+    public ResponseDTO<FinancialStatusResponse> getFinanceOverview() {
+        return ResponseDTO.<FinancialStatusResponse>builder()
+                .data(financeService.getFinancialCondition()).build();
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public Boolean addIncome(@RequestBody AddIncomeRequest addIncomeRequest) {
-        return financeService.addIncome(addIncomeRequest);
+    public ResponseDTO<Boolean> addIncome(@RequestBody AddIncomeRequest addIncomeRequest) {
+        return ResponseDTO.<Boolean>builder()
+                .data(financeService.addIncome(addIncomeRequest)).build();
     }
 
     @DeleteMapping("{id}")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public Boolean deleteGoal(@PathVariable("id") Long id) {
-        return financeService.deleteIncome(id);
+    public ResponseDTO<Boolean> deleteGoal(@PathVariable("id") Long id) {
+        return ResponseDTO.<Boolean>builder()
+                .data(financeService.deleteIncome(id)).build();
     }
 
 
