@@ -6,8 +6,8 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://postgresql-179164-0.cloudclusters.net:10035/postgresDB
-    username: postgresUser
+    url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres
+    username: postgres.elmebsnxttzjxngthlsu
     password: postgresPW97
 #    url: jdbc:h2:mem:pullm
 #    username: sa
