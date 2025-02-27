@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add currency column to user incoem
+      author: Shamistan Huseynov
+      description: add currency column to usr incm table
+      changes:
+        - addColumn:
+            tableName: user_income
+            columns:
+              - column:
+                  name: currency
+                  type: varchar(256)

@@ -6,6 +6,7 @@ import com.pullm.backendmonolit.entities.enums.IncomeType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Currency;
 import java.util.TimeZone;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,8 @@ public class AddIncomeRequest {
     private IncomeType incomeType;
     @JsonProperty("amount")
     private BigDecimal amount;
+    @JsonProperty("currency")
+    private String currency;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd" )
     @JsonProperty("date")
     private LocalDate date;

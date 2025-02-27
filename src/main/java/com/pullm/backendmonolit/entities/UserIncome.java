@@ -44,6 +44,8 @@ public class UserIncome {
     @Enumerated(EnumType.STRING)
     private IncomeType incomeType;
 
+    private String currency;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

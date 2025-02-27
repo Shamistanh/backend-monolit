@@ -11,5 +11,6 @@ public class FinancialStatusResponse {
     private BigDecimal balance;
     private BigDecimal monthlyIncome;
     private BigDecimal monthlyExpense;
+    private String currency;
     private Long userId;
 }

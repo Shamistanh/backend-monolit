@@ -6,7 +6,6 @@ import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.request.CurrencyRequest;
 import com.pullm.backendmonolit.models.response.CurrencyResponse;
-import com.pullm.backendmonolit.models.response.ExchangeRateResponse;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.ConversionService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
@@ -46,6 +45,18 @@ public class ConversionServiceImpl implements ConversionService {
         return bd.doubleValue();
     }
 
+    public double convertAmount(double amount, String currency) {
+        try {
+            Double rate = exchangeRateClient.getExchangeRates().getRates().get(currency);
+            BigDecimal bd = new BigDecimal(Double.toString(rate * amount));
+            bd = bd.setScale(2, RoundingMode.HALF_UP);
+            return bd.doubleValue();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return amount;
+        }
+    }
+
     public List<CurrencyResponse> getAvailableCurrencies() {
         List<CurrencyResponse> currencies = new ArrayList<>();
         exchangeRateClient.getExchangeRates().getRates().forEach((k, v) -> currencies.add(CurrencyResponse.builder()
@@ -67,7 +78,10 @@ public class ConversionServiceImpl implements ConversionService {
 
     private String getCurrency() {
         try {
-            return request.getHeader(ACCEPT_CURRENCY) == null ? AZN :  request.getHeader(ACCEPT_CURRENCY);
+            Optional<User> userByEmail = userRepository.findUserByEmail(extractMobileNumber());
+            return request.getHeader(ACCEPT_CURRENCY) == null ?
+                    userByEmail.map(User::getCurrency).orElse(null) :
+                    request.getHeader(ACCEPT_CURRENCY);
         } catch (Exception e) {
             log.error(e.getMessage());
             return AZN;
