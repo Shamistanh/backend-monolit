@@ -1,11 +1,15 @@
 package com.pullm.backendmonolit.services.impl;
 
 import static com.pullm.backendmonolit.consatnts.Constants.findProductTypeBySubType;
+import static com.pullm.backendmonolit.enums.DateRange.DAILY;
+import static com.pullm.backendmonolit.enums.DateRange.MONTHLY;
+import static com.pullm.backendmonolit.enums.DateRange.YEARLY;
 
 import com.pullm.backendmonolit.entities.Product;
 import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.entities.enums.TransactionType;
+import com.pullm.backendmonolit.enums.DateRange;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.mapper.TransactionMapper;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
@@ -16,6 +20,7 @@ import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.ConversionService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -95,15 +100,41 @@ public class TransactionsServiceImpl {
         log.info("getAllTransactions().start DateCriteria: {}", dateCriteria);
 
         User user = getUser();
-        LocalDateTime fromDate = dateCriteria.getFromDate().atStartOfDay();
-        LocalDateTime toDate = dateCriteria.getToDate().atStartOfDay();
+        Pair<LocalDateTime, LocalDateTime> dateTimePair = dateCriteria.getDateRange() != null
+                ? getDateRange(dateCriteria) : Pair.of(dateCriteria.getFromDate().atStartOfDay(),
+                dateCriteria.getToDate().atStartOfDay());
 
-        var transactions = transactionRepository.findAllByUserIdAndDateBetween(user.getId(), fromDate, toDate);
+        var transactions = transactionRepository.findAllByUserIdAndDateBetween(user.getId(), dateTimePair.getFirst(),
+                dateTimePair.getSecond());
         var transactionRequests = transactionMapper.mapToTransactionResponseList(transactions);
 
         log.info("getAllTransactions().end");
 
         return transactionRequests;
+    }
+
+    private Pair<LocalDateTime, LocalDateTime> getDateRange(DateCriteria dateCriteria) {
+        LocalDateTime fromDate;
+        LocalDateTime toDate;
+        switch (dateCriteria.getDateRange()) {
+            case DAILY -> {
+                fromDate = LocalDate.now().minusDays(1).atStartOfDay();
+                toDate = LocalDate.now().plusDays(1).atStartOfDay();
+            }
+            case MONTHLY -> {
+                fromDate = LocalDate.now().minusMonths(1).atStartOfDay();
+                toDate = LocalDate.now().plusMonths(1).atStartOfDay();
+            }
+            case YEARLY -> {
+                fromDate = LocalDate.now().minusYears(1).atStartOfDay();
+                toDate = LocalDate.now().plusYears(1).atStartOfDay();
+            }
+            default -> {
+                fromDate = dateCriteria.getFromDate().atStartOfDay();
+                toDate = dateCriteria.getToDate().atStartOfDay();
+            }
+        }
+        return Pair.of(fromDate, toDate);
     }
 
     private User getUser() {
