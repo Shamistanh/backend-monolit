@@ -43,7 +43,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                          GROUP BY p.productType
                     """
     )
-    List<ChartResponse> getAllChartResponse(LocalDate startDate, LocalDate endDate, Long userId);
+    List<ChartResponse> getAllChartResponse(LocalDateTime startDate, LocalDateTime endDate, Long userId);
 
 
     @Query(

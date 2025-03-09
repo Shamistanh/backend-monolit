@@ -11,11 +11,14 @@ import com.pullm.backendmonolit.models.response.ChartResponse;
 import com.pullm.backendmonolit.models.response.PopularProductResponse;
 import com.pullm.backendmonolit.repository.ProductRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -33,8 +36,15 @@ public class ProductServiceImpl {
         log.info("getAllChartResponse().start DateCriteria: {} ", dateCriteria);
 
         Long userId = getUser().getId();
+
+        Pair<LocalDateTime, LocalDateTime> dateTimePair = dateCriteria.getDateRange() != null
+                ? getDateRange(dateCriteria) : Pair.of(dateCriteria.getFromDate().atStartOfDay(),
+                dateCriteria.getToDate().atStartOfDay());
+
         List<ChartResponse> allChartResponse =
-                productRepository.getAllChartResponse(dateCriteria.getToDate(), dateCriteria.getFromDate(), userId);
+                productRepository.getAllChartResponse(dateTimePair.getFirst(),
+                     dateTimePair.getSecond(),
+                        userId);
         log.info("getAllChartResponse().end");
 
         return allChartResponse;
@@ -90,5 +100,30 @@ public class ProductServiceImpl {
     public List<ProductSubType> getProductSubType(ProductType productType) {
         return Constants.findProductTypeByType(productType);
     }
+
+    private Pair<LocalDateTime, LocalDateTime> getDateRange(DateCriteria dateCriteria) {
+        LocalDateTime fromDate;
+        LocalDateTime toDate;
+        switch (dateCriteria.getDateRange()) {
+            case DAILY -> {
+                fromDate = LocalDate.now().minusDays(1).atStartOfDay();
+                toDate = LocalDate.now().plusDays(1).atStartOfDay();
+            }
+            case MONTHLY -> {
+                fromDate = LocalDate.now().minusMonths(1).atStartOfDay();
+                toDate = LocalDate.now().plusMonths(1).atStartOfDay();
+            }
+            case YEARLY -> {
+                fromDate = LocalDate.now().minusYears(1).atStartOfDay();
+                toDate = LocalDate.now().plusYears(1).atStartOfDay();
+            }
+            default -> {
+                fromDate = dateCriteria.getFromDate().atStartOfDay();
+                toDate = dateCriteria.getToDate().atStartOfDay();
+            }
+        }
+        return Pair.of(fromDate, toDate);
+    }
+
 
 }
