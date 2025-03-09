@@ -8,12 +8,19 @@ import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.ProductRequest;
 import com.pullm.backendmonolit.models.response.ChartResponse;
+import com.pullm.backendmonolit.models.response.ChartResponseWrapper;
 import com.pullm.backendmonolit.models.response.PopularProductResponse;
 import com.pullm.backendmonolit.repository.ProductRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +39,7 @@ public class ProductServiceImpl {
     private final ProductRepository productRepository;
 
 
-    public List<ChartResponse> getAllChartResponse(DateCriteria dateCriteria) {
+    public ChartResponseWrapper getAllChartResponse(DateCriteria dateCriteria) {
         log.info("getAllChartResponse().start DateCriteria: {} ", dateCriteria);
 
         Long userId = getUser().getId();
@@ -45,10 +52,32 @@ public class ProductServiceImpl {
                 productRepository.getAllChartResponse(dateTimePair.getFirst(),
                      dateTimePair.getSecond(),
                         userId);
+        addPercentages(allChartResponse);
         log.info("getAllChartResponse().end");
-
-        return allChartResponse;
+        List<ChartResponse> chartResponses = addMissingProductTypesWithDefaultValue(allChartResponse);
+        return ChartResponseWrapper.builder()
+                .allChartResponse(chartResponses)
+                .totalExpense(chartResponses.stream().map(ChartResponse::getPrice).reduce(BigDecimal.ZERO,
+                        BigDecimal::add))
+                .build();
     }
+
+    private List<ChartResponse> addMissingProductTypesWithDefaultValue(List<ChartResponse> allChartResponse) {
+        Set<ProductType> existingProductTypes = allChartResponse.stream()
+                .map(ChartResponse::getType)
+                .collect(Collectors.toSet());
+
+        List<ChartResponse> missingResponses = Arrays.stream(ProductType.values())
+                .filter(productType -> !existingProductTypes.contains(productType))
+                .map(productType -> ChartResponse.builder()
+                        .type(productType)
+                        .percentage(BigDecimal.ZERO)
+                        .price(BigDecimal.ZERO)
+                        .build())
+                .toList();
+        return new ArrayList<>(allChartResponse) {{ addAll(missingResponses); }};
+    }
+
 
     public void updateProduct(Long id, ProductRequest productRequest) {
         log.info("updateProduct().start id: {}", id);
@@ -123,6 +152,19 @@ public class ProductServiceImpl {
             }
         }
         return Pair.of(fromDate, toDate);
+    }
+
+    private void addPercentages(List<ChartResponse> allChartResponse) {
+        try {
+            BigDecimal totalPrice = allChartResponse.stream()
+                    .map(ChartResponse::getPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            allChartResponse.forEach(chartResponse -> chartResponse.
+                    setPercentage(chartResponse.getPrice().divide(totalPrice,
+                            RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))));
+        }catch (Exception e) {
+            log.error("Percentages cannot be added",e);
+        }
     }
 
 

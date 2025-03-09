@@ -12,9 +12,16 @@ import lombok.NoArgsConstructor;
 public class ChartResponse {
     private ProductType type;
     private BigDecimal price;
+    private BigDecimal percentage;
 
     public ChartResponse(ProductType type, BigDecimal price) {
         this.type = type;
         this.price = price;
+    }
+
+    public ChartResponse(ProductType type, BigDecimal price, BigDecimal percentage) {
+        this.type = type;
+        this.price = price;
+        this.percentage = percentage;
     }
 }

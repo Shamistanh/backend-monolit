@@ -4,7 +4,7 @@ import com.pullm.backendmonolit.entities.enums.ProductSubType;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.ProductRequest;
-import com.pullm.backendmonolit.models.response.ChartResponse;
+import com.pullm.backendmonolit.models.response.ChartResponseWrapper;
 import com.pullm.backendmonolit.models.response.PopularProductResponse;
 import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.services.impl.ProductServiceImpl;
@@ -30,8 +30,8 @@ public class ProductController {
     @GetMapping("/chart")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseDTO<List<ChartResponse>> getAllChartResponse(DateCriteria dateCriteria) {
-        return ResponseDTO.<List<ChartResponse>>builder()
+    public ResponseDTO<ChartResponseWrapper> getAllChartResponse(DateCriteria dateCriteria) {
+        return ResponseDTO.<ChartResponseWrapper>builder()
                 .data(productService.getAllChartResponse(dateCriteria)).build();
     }
 
