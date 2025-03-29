@@ -57,3 +57,6 @@ management:
 #logging:
 #  level:
 #    root: debug
+
+ekassa:
+  url: "https://monitoring.e-kassa.gov.az/pks-monitoring/2.0.0/documents/"

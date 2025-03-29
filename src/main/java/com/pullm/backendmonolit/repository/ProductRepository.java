@@ -55,6 +55,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
               Product p
             INNER JOIN p.transaction t WHERE t.user.id = :userId
             and p.productType = :productType
+            and t.date IS NOT NULL       
             GROUP BY
               EXTRACT(YEAR FROM t.date), EXTRACT(MONTH FROM t.date)
             """
