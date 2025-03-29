@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -122,13 +123,30 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private List<StatisticsCategory> addPercentage(StatisticsDetail statisticsDetail) {
-        return statisticsDetail.getStatisticsCategories().stream().map(category -> {
+
+        List<StatisticsCategory> statisticsCategories =
+                statisticsDetail.getStatisticsCategories().stream().map(category -> {
             category.setPercentage(
                     category.getProductBasedTotalPrice()
                             .divide(statisticsDetail.getTotalAmount(), RoundingMode.HALF_UP)
                             .multiply(BigDecimal.valueOf(100)));
             return category;
         }).collect(Collectors.toList());
+
+        List<String> existingCategories
+                = statisticsCategories.stream().map(StatisticsCategory::getProductType).toList();
+
+        Stream.of(ProductType.values()).forEach(type -> {
+
+            if (!existingCategories.contains(type.getValue())) {
+                statisticsCategories.add(StatisticsCategory.builder()
+                        .productType(String.valueOf(type))
+                        .color(type.getColor())
+                        .build());
+            }
+        });
+
+        return statisticsCategories;
     }
 
     private StatisticsCategory getStatisticsCategoryResponse(List<ChartSingleResponse> chartValues,
