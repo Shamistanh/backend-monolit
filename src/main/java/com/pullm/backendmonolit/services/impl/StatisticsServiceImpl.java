@@ -138,7 +138,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Stream.of(ProductType.values()).forEach(type -> {
 
-            if (!existingCategories.contains(type.getValue())) {
+            if (!existingCategories.contains(type.toString())) {
                 statisticsCategories.add(StatisticsCategory.builder()
                         .productType(String.valueOf(type))
                         .color(type.getColor())
