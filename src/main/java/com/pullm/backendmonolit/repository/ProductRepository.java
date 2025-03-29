@@ -106,9 +106,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("""
                     SELECT new com.pullm.backendmonolit.models.response.StatisticsProductResponse(
-                    t.date,
+                t.date,
                 p.name,
                 p.price,
+                p.weight,      
                 p.count,
                 p.productSubType)
                     FROM
