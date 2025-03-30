@@ -1,6 +1,8 @@
 package com.pullm.backendmonolit.models.response;
 
 import com.pullm.backendmonolit.entities.enums.ProductSubType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ public class StatisticsProductResponse {
     private BigDecimal price;
     private BigDecimal weight;
     private Integer count;
+    @Enumerated(EnumType.STRING)
     private ProductSubType productSubType;
 
 }
