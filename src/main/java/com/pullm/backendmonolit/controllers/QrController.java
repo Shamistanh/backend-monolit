@@ -1,11 +1,13 @@
 package com.pullm.backendmonolit.controllers;
 
+import com.pullm.backendmonolit.models.response.ProcessedReceipt;
 import com.pullm.backendmonolit.models.response.Receipt;
 import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.services.QrService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +26,14 @@ public class QrController {
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseDTO<Receipt> getQrData(@RequestParam String fiscalId) {
         return ResponseDTO.<Receipt>builder().data(qrService.getReceiptResponse(fiscalId)).build();
+    }
+
+    @GetMapping(path = "/process-receipt",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(code = HttpStatus.OK)
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseDTO<ProcessedReceipt> processQrData(@RequestParam String imageUrl) {
+        return ResponseDTO.<ProcessedReceipt>builder().data(qrService.processReceiptResponse(imageUrl)).build();
     }
 
 }

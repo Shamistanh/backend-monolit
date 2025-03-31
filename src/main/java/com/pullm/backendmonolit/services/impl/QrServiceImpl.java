@@ -1,7 +1,10 @@
 package com.pullm.backendmonolit.services.impl;
 
+import com.pullm.backendmonolit.client.QrAiProcessorClient;
 import com.pullm.backendmonolit.client.QrOcrClient;
+import com.pullm.backendmonolit.models.request.ProcessingReceipt;
 import com.pullm.backendmonolit.models.response.ByteArrayMultipartFile;
+import com.pullm.backendmonolit.models.response.ProcessedReceipt;
 import com.pullm.backendmonolit.models.response.Receipt;
 import com.pullm.backendmonolit.services.QrService;
 import java.io.IOException;
@@ -24,6 +27,8 @@ public class QrServiceImpl implements QrService {
 
     private final QrOcrClient qrOcrClient;
 
+    private final QrAiProcessorClient qrAiProcessorClient;
+
     @Value("${ekassa.url}")
     private String ekassaUrl;
 
@@ -33,6 +38,18 @@ public class QrServiceImpl implements QrService {
         try {
             return qrOcrClient.uploadReceipt(downloadImage(imageUrl));
         } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    @Override
+    public ProcessedReceipt processReceiptResponse(String fiscalId) {
+        String imageUrl = ekassaUrl + fiscalId;
+        try {
+            return qrAiProcessorClient.processReceipt(new ProcessingReceipt(imageUrl));
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
