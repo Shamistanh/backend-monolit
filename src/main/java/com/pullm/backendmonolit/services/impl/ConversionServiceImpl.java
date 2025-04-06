@@ -47,6 +47,9 @@ public class ConversionServiceImpl implements ConversionService {
 
     public double convertAmount(double amount) {
         Double rate = exchangeRateClient.getExchangeRates().getRates().get(getCurrency());
+        if (rate == null) {
+            rate = 1d;
+        }
         BigDecimal bd = new BigDecimal(Double.toString(rate * amount));
         bd = bd.setScale(2, RoundingMode.HALF_UP);
         return bd.doubleValue();
