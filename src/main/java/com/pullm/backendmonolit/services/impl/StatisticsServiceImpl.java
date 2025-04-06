@@ -51,12 +51,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private StatisticsDetail getYearlyData(LocalDateTime startDate, LocalDateTime endDate) {
+        Long userId = getUser().getId();
         StatisticsDetail statisticsDetail = StatisticsDetail.builder()
                 .statisticsCategories(
-                        productRepository.getAllProductTypes(getUser().getId(), startDate, endDate).stream().map(productType -> {
+                        productRepository.getAllProductTypes(userId, startDate, endDate).stream().map(productType -> {
                             List<ChartSingleResponse> statisticsDetailsByMonth =
                                     productRepository.getStatisticsDetailsByYear(ProductType.valueOf(productType),
-                                            getUser().getId());
+                                            userId);
                             return getStatisticsCategoryResponse(statisticsDetailsByMonth, productType);
                         }).collect(Collectors.toList()))
                 .range(DateRange.YEARLY)
@@ -74,12 +75,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private StatisticsDetail getMonthlyData(LocalDateTime startDate, LocalDateTime endDate) {
+        Long userId = getUser().getId();
         StatisticsDetail statisticsDetail = StatisticsDetail.builder()
                 .statisticsCategories(
-                        productRepository.getAllProductTypes(getUser().getId(), startDate, endDate).stream().map(productType -> {
+                        productRepository.getAllProductTypes(userId, startDate, endDate).stream().map(productType -> {
                             List<ChartSingleResponse> statisticsDetailsByMonth =
                                     productRepository.getStatisticsDetailsByMonth(ProductType.valueOf(productType),
-                                            getUser().getId());
+                                            userId);
                             return getStatisticsCategoryResponse(statisticsDetailsByMonth, productType);
                         }).collect(Collectors.toList()))
                 .range(DateRange.MONTHLY)
@@ -98,12 +100,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private StatisticsDetail getDailyData(LocalDateTime startDate, LocalDateTime endDate) {
+        Long userId = getUser().getId();
         StatisticsDetail statisticsDetail = StatisticsDetail.builder()
                 .statisticsCategories(
-                        productRepository.getAllProductTypes(getUser().getId(), startDate, endDate).stream().map(productType -> {
+                        productRepository.getAllProductTypes(userId, startDate, endDate).stream().map(productType -> {
                             List<ChartSingleResponse> statisticsDetailsByMonth =
                                     productRepository.getStatisticsDetailsByDay(ProductType.valueOf(productType),
-                                            getUser().getId());
+                                            userId);
                             return getStatisticsCategoryResponse(statisticsDetailsByMonth, productType);
                         }).collect(Collectors.toList()))
                 .range(DateRange.DAILY)
