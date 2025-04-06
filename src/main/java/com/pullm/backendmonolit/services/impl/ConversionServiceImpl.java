@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.util.Pair;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +36,12 @@ public class ConversionServiceImpl implements ConversionService {
     private final HttpServletRequest request;
 
     private static final String AZN = "AZN";
+    private static final String USD = "USD";
+    private static final String EUR = "EUR";
+    private static final String TRY = "TRY";
+    private static final String RUB = "TRY";
+    private static final String GBP = "GBP";
+    public List<String> CURRENCIES = List.of(AZN, USD, EUR, TRY, RUB, GBP);
 
     private static final String ACCEPT_CURRENCY = "accept-currency";
 
@@ -57,13 +64,27 @@ public class ConversionServiceImpl implements ConversionService {
         }
     }
 
+    public BigDecimal getConversionRateByCurrencyCode(String currency) {
+        return BigDecimal.valueOf(getAvailableCurrencies().stream()
+                .filter(currencyResponse -> currency.equals(currencyResponse.getCurrencyCode()))
+                .findAny().orElse(CurrencyResponse.builder().rate(0d).build()).getRate());
+    }
+
+    @Cacheable("currencies")
     public List<CurrencyResponse> getAvailableCurrencies() {
+        log.info("Calling getAvailableCurrencies");
         List<CurrencyResponse> currencies = new ArrayList<>();
-        exchangeRateClient.getExchangeRates().getRates().forEach((k, v) -> currencies.add(CurrencyResponse.builder()
-                        .flag(getCountryFlag(k))
-                .currencyCode(k)
-                .rate(v)
-                .build()));
+        exchangeRateClient.getExchangeRates().getRates().forEach((k, v) -> {
+                    if (CURRENCIES.contains(k)) {
+                        currencies.add(CurrencyResponse.builder()
+                                .flag(getCountryFlag(k))
+                                .currencyCode(k)
+                                .rate(v)
+                                .build());
+                    }
+                }
+
+        );
         return currencies;
     }
 

@@ -45,7 +45,7 @@ public class UserIncome {
     private IncomeType incomeType;
 
     private String currency;
-
+    private BigDecimal rate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

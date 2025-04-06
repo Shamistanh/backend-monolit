@@ -2,8 +2,14 @@ server:
   port: ${PORT:8080}
   error:
     include-message: always
-
+logging:
+  level:
+    org.springframework.cache: DEBUG
 spring:
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=100m
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres

@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add rate column to user income
+      author: Shamistan Huseynov
+      description: add rate column to usr incm table
+      changes:
+        - addColumn:
+            tableName: user_income
+            columns:
+              - column:
+                  name: rate
+                  type: decimal(10, 2)

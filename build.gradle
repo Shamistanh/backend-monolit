@@ -33,7 +33,10 @@ dependencies {
             'org.springframework.cloud:spring-cloud-starter-openfeign',
             'org.springframework.boot:spring-boot-starter-actuator',
             'org.springframework.boot:spring-boot-starter-mail',
-            'org.springframework.boot:spring-boot-starter-thymeleaf'
+            'org.springframework.boot:spring-boot-starter-thymeleaf',
+            'com.github.ben-manes.caffeine:caffeine',
+            'org.springframework.boot:spring-boot-starter-cache'
+
     )
 //      Feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'

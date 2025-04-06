@@ -40,18 +40,13 @@ public class FinanceServiceImpl implements FinanceService {
         BigDecimal monthlyExpenseOfUser = findMonthlyExpenseOfUser();
         BigDecimal balance = monthlyIncomeOfUser.subtract(monthlyExpenseOfUser);
         Pair<String, Double> currentCurrency = conversionServiceImpl.getCurrentCurrency();
-        BigDecimal convertedIncome = monthlyIncomeOfUser.divide(BigDecimal.valueOf(currentCurrency.getSecond()),
-                2, RoundingMode.HALF_UP);
-
-        BigDecimal convertedExpense = monthlyExpenseOfUser.divide(BigDecimal.valueOf(currentCurrency.getSecond()),
-                2, RoundingMode.HALF_UP);
 
         return FinancialStatusResponse.builder()
                 .userId(getUser().getId())
                 .balance(balance)
                 .currency(currentCurrency.getFirst())
-                .monthlyIncome(convertedIncome.setScale(2, RoundingMode.HALF_UP))
-                .monthlyExpense(convertedExpense.setScale(2, RoundingMode.HALF_UP))
+                .monthlyIncome(monthlyIncomeOfUser.setScale(2, RoundingMode.HALF_UP))
+                .monthlyExpense(monthlyExpenseOfUser.setScale(2, RoundingMode.HALF_UP))
                 .build();
     }
 
@@ -65,6 +60,7 @@ public class FinanceServiceImpl implements FinanceService {
                     .incomeType(addIncomeRequest.getIncomeType())
                     .amount(addIncomeRequest.getAmount())
                     .currency(addIncomeRequest.getCurrency())
+                    .rate(conversionServiceImpl.getConversionRateByCurrencyCode(addIncomeRequest.getCurrency()))
                     .user(user)
                     .build());
             return true;
@@ -103,22 +99,16 @@ public class FinanceServiceImpl implements FinanceService {
         LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
         LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
         return userIncomeRepository.findAllByUserIdAndDateBetween(getUser().getId(),
-                        startOfMonth, endOfMonth).stream().map(this::convertAndReturnAmount)
+                        startOfMonth, endOfMonth).stream().map(income->
+                        income.getAmount().divide(income.getRate(), 2, RoundingMode.HALF_UP))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     }
 
-    private BigDecimal convertAndReturnAmount(UserIncome userIncome) {
-        BigDecimal amount = userIncome.getAmount();
-        String currency = userIncome.getCurrency();
-        return BigDecimal.valueOf(conversionServiceImpl.convertAmount(amount.doubleValue(), currency));
-    }
-
     private BigDecimal convertAndReturnAmount(Transaction transaction) {
         BigDecimal amount = transaction.getTotalAmount();
-        String currency = transaction.getCurrency();
-        return BigDecimal.valueOf(conversionServiceImpl
-                .convertAmount(amount.multiply(BigDecimal.valueOf(transaction.getRate())).doubleValue(), currency));
+        return BigDecimal.valueOf(amount.divide(BigDecimal
+                .valueOf(transaction.getRate()),RoundingMode.HALF_UP).doubleValue());
     }
 
     private User getUser() {

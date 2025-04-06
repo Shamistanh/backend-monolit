@@ -3,10 +3,11 @@ package com.pullm.backendmonolit.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import feign.codec.Decoder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FeignClientConfig {
@@ -25,10 +26,9 @@ public class FeignClientConfig {
 
         @Override
         public Object decode(Response response, Type type) throws IOException {
-            // Read the response body
-            String body = new String(response.body().asInputStream().readAllBytes());
-            
-            // Try to parse JSON manually, even if Content-Type is text/html
+            String body = new String(response.body().asInputStream().readAllBytes(),
+                    Charset.forName("ISO-8859-9"));
+
             return objectMapper.readValue(body, objectMapper.constructType(type));
         }
     }
