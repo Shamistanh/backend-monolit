@@ -100,7 +100,8 @@ public class FinanceServiceImpl implements FinanceService {
         LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(23, 59, 59);
         return userIncomeRepository.findAllByUserIdAndDateBetween(getUser().getId(),
                         startOfMonth, endOfMonth).stream().map(income->
-                        income.getAmount().divide(income.getRate(), 2, RoundingMode.HALF_UP))
+                        income.getAmount().divide(income.getRate() !=null ? income.getRate()
+                                        : BigDecimal.ONE, 2, RoundingMode.HALF_UP))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     }
@@ -108,7 +109,8 @@ public class FinanceServiceImpl implements FinanceService {
     private BigDecimal convertAndReturnAmount(Transaction transaction) {
         BigDecimal amount = transaction.getTotalAmount();
         return BigDecimal.valueOf(amount.divide(BigDecimal
-                .valueOf(transaction.getRate()),RoundingMode.HALF_UP).doubleValue());
+                .valueOf(transaction.getRate() !=null ? transaction.getRate()
+                        : 1d),RoundingMode.HALF_UP).doubleValue());
     }
 
     private User getUser() {
