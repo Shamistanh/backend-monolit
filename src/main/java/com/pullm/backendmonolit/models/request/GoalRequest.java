@@ -2,6 +2,8 @@ package com.pullm.backendmonolit.models.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pullm.backendmonolit.enums.GoalPriority;
+import com.pullm.backendmonolit.enums.GoalStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -20,4 +22,6 @@ public class GoalRequest {
     @JsonProperty("goalEndDate")
     private LocalDate goalEndDate;
     private BigDecimal amount;
+    private GoalPriority goalPriority;
+    private GoalStatus status;
 }

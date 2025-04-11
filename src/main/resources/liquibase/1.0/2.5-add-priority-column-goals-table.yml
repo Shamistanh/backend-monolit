@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add priority column to goal table
+      author: Shamistan Huseynov
+      description:  add priority column to goal table
+      changes:
+        - addColumn:
+            tableName: goal
+            columns:
+              - column:
+                  name: goal_priority
+                  type: varchar(16)

@@ -1,6 +1,6 @@
 package com.pullm.backendmonolit.entities;
 
-import com.pullm.backendmonolit.entities.enums.IncomeType;
+import com.pullm.backendmonolit.enums.GoalPriority;
 import com.pullm.backendmonolit.enums.GoalStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,8 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,6 +43,9 @@ public class Goal {
     private String name;
 
     private LocalDate startDate;
+
+    @Enumerated(EnumType.STRING)
+    private GoalPriority goalPriority;
 
     private LocalDate endDate;
 

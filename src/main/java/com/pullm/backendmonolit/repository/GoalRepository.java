@@ -2,6 +2,7 @@ package com.pullm.backendmonolit.repository;
 
 import com.pullm.backendmonolit.entities.Goal;
 import com.pullm.backendmonolit.entities.User;
+import com.pullm.backendmonolit.enums.GoalPriority;
 import com.pullm.backendmonolit.enums.GoalStatus;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     Optional<Goal> findByIdAndUser(long id, User userId);
+
+    Boolean existsByUserAndGoalPriorityAndStatus(User user, GoalPriority goalPriority, GoalStatus status);
 
     List<Goal> findAllByUser(User userId);
 

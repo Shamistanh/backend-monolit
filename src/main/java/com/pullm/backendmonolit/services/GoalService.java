@@ -12,7 +12,7 @@ public interface GoalService {
 
     GoalResponse getAllGoals(GoalStatus status);
 
-    Boolean createGoal(GoalRequest goalRequest);
+    String createGoal(GoalRequest goalRequest);
 
     Boolean deleteGoal(Long id);
 

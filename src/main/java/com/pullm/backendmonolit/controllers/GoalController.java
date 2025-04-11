@@ -54,8 +54,8 @@ public class GoalController {
     @PostMapping
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseDTO<Boolean> createGoal(@RequestBody GoalRequest goalRequest) {
-        return ResponseDTO.<Boolean>builder()
+    public ResponseDTO<String> createGoal(@RequestBody GoalRequest goalRequest) {
+        return ResponseDTO.<String>builder()
                 .data(goalService.createGoal(goalRequest)).build();
     }
 

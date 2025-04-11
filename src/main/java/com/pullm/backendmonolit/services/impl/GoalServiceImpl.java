@@ -124,18 +124,33 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public Boolean createGoal(GoalRequest goalRequest) {
+    public String createGoal(GoalRequest goalRequest) {
         User user = getUser();
-        goalRepository.save(Goal.builder()
+        boolean alreadyHasActiveGoal = goalRepository.existsByUserAndGoalPriorityAndStatus(
+                user, goalRequest.getGoalPriority(), GoalStatus.ACTIVE);
+
+        GoalStatus targetStatus = (alreadyHasActiveGoal && goalRequest.getStatus() == GoalStatus.ACTIVE)
+                ? GoalStatus.PENDING
+                : GoalStatus.ACTIVE;
+
+        Goal newGoal = Goal.builder()
                 .user(user)
-                .startDate(LocalDate.now())
-                .endDate(goalRequest.getGoalEndDate())
                 .name(goalRequest.getGoalName())
                 .amount(goalRequest.getAmount())
-                .status(GoalStatus.PENDING)
-                .build());
-        return true;
+                .startDate(LocalDate.now())
+                .endDate(goalRequest.getGoalEndDate())
+                .goalPriority(goalRequest.getGoalPriority())
+                .status(targetStatus)
+                .build();
+
+        goalRepository.save(newGoal);
+
+        return targetStatus == GoalStatus.PENDING
+                ? "You already have an active goal with this priority, so the new goal is set to PENDING."
+                : "No active goal found with this priority, so the new goal is set to ACTIVE.";
     }
+
+
 
     @Override
     public Boolean deleteGoal(Long id) {
