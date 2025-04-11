@@ -16,12 +16,14 @@ import com.pullm.backendmonolit.repository.UserIncomeRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.GoalService;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,84 +46,90 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public GoalSingleResponse getGoal(Long id) {
         User user = getUser();
-        Optional<Goal> goalRepositoryById = goalRepository.findByIdAndUser(id, user);
+        Goal goal = goalRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new NoSuchElementException("Goal not found for user with id: " + id));
 
-        BigDecimal monthlyExpenseOfUser = findMonthlyExpenseOfUser();
-
+        BigDecimal monthlyExpense = findMonthlyExpenseOfUser();
         BigDecimal monthlyIncome = findMonthlyIncomeOfUser();
-        if (goalRepositoryById.isPresent()) {
+        BigDecimal balance = monthlyIncome.subtract(monthlyExpense);
 
-            Goal goal = goalRepositoryById.get();
-
-            BigDecimal balance = monthlyIncome.subtract(monthlyExpenseOfUser);
-
-            GoalSingleResponse goalSingleResponse = GoalSingleResponse.builder()
-                    .startDate(goal.getStartDate())
-                    .endDate(goal.getEndDate())
-                    .name(goal.getName())
-                    .amount(goal.getAmount())
-                    .monthlyTotalExpenses(monthlyExpenseOfUser)
-                    .balance(balance)
-                    .status(goal.getStatus())
-                    .build();
-
+        int percentage = 0;
+        if (goal.getStatus() == GoalStatus.ACTIVE) {
             if (balance.compareTo(goal.getAmount()) >= 0) {
-                goalSingleResponse.setPercentage(100);
-            }else if(balance.compareTo(BigDecimal.ZERO) <= 0){
-                goalSingleResponse.setPercentage(0);
-            }else {
-                goalSingleResponse.setPercentage(Math.round(balance.doubleValue() / goal.getAmount().doubleValue() * 100.0));
+                percentage = 100;
+            } else if (balance.compareTo(BigDecimal.ZERO) <= 0) {
+                percentage = 0;
+            } else {
+                percentage = Math.round(balance
+                        .divide(goal.getAmount(), 4, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100))
+                        .floatValue());
             }
-
-            return goalSingleResponse;
         }
-        return null;
+
+        return GoalSingleResponse.builder()
+                .startDate(goal.getStartDate())
+                .endDate(goal.getEndDate())
+                .name(goal.getName())
+                .amount(goal.getAmount())
+                .monthlyTotalExpenses(monthlyExpense)
+                .balance(balance)
+                .status(goal.getStatus())
+                .percentage(percentage)
+                .build();
     }
 
     @Override
     public GoalResponse getAllGoals(GoalStatus status) {
         User user = getUser();
-        List<Goal> goals;
+        List<Goal> goals = (status != null)
+                ? goalRepository.findAllByUserAndStatus(user, status)
+                : goalRepository.findAllByUser(user);
 
-        if (status != null) {
-            goals = goalRepository.findAllByUserAndStatus(user, status);
-        }else {
-            goals = goalRepository.findAllByUser(user);
-        }
+        BigDecimal monthlyExpense = findMonthlyExpenseOfUser();
+        BigDecimal monthlyIncome = findMonthlyIncomeOfUser();
+        BigDecimal balance = monthlyIncome.subtract(monthlyExpense);
 
+        List<GoalSingleResponse> responses = new ArrayList<>();
+        BigDecimal remainingBalance = balance;
 
-        List<GoalSingleResponse> goalSingleResponses = new ArrayList<>();
-        goals.forEach(goal -> {
-
-            BigDecimal monthlyExpenseOfUser = findMonthlyExpenseOfUser();
-            BigDecimal monthlyIncome = findMonthlyIncomeOfUser();
-            BigDecimal balance = monthlyIncome.subtract(monthlyExpenseOfUser);
-
-            GoalSingleResponse goalSingleResponse = GoalSingleResponse.builder()
+        for (Goal goal : goals) {
+            GoalSingleResponse.GoalSingleResponseBuilder builder = GoalSingleResponse.builder()
                     .startDate(goal.getStartDate())
                     .endDate(goal.getEndDate())
                     .name(goal.getName())
                     .amount(goal.getAmount())
-                    .monthlyTotalExpenses(monthlyExpenseOfUser)
+                    .monthlyTotalExpenses(monthlyExpense)
                     .balance(balance)
-                    .status(goal.getStatus())
-                    .build();
+                    .status(goal.getStatus());
 
-            if (balance.compareTo(goal.getAmount()) >= 0) {
-                goalSingleResponse.setPercentage(100);
-            }else if(balance.compareTo(BigDecimal.ZERO) <= 0){
-                goalSingleResponse.setPercentage(0);
-            }else {
-                goalSingleResponse.setPercentage(Math.round(balance.doubleValue() / goal.getAmount().doubleValue() * 100.0));
+            if (goal.getStatus() == GoalStatus.ACTIVE) {
+                int percentage = 0;
+
+                if (remainingBalance.compareTo(BigDecimal.ZERO) > 0) {
+                    if (remainingBalance.compareTo(goal.getAmount()) >= 0) {
+                        percentage = 100;
+                        remainingBalance = remainingBalance.subtract(goal.getAmount());
+                    } else {
+                        percentage = Math.round(remainingBalance
+                                .divide(goal.getAmount(), 4, RoundingMode.HALF_UP)
+                                .multiply(BigDecimal.valueOf(100))
+                                .floatValue());
+                    }
+                }
+
+                builder.percentage(percentage);
             }
 
-            goalSingleResponses.add(goalSingleResponse);
-        });
+            responses.add(builder.build());
+        }
+
         return GoalResponse.builder()
-                .goals(goalSingleResponses)
                 .userId(user.getId())
+                .goals(responses)
                 .build();
     }
+
 
     @Override
     public String createGoal(GoalRequest goalRequest) {
@@ -165,22 +173,50 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public Boolean changeGoalStatus(ChangeGoalStatusRequest changeGoalStatusRequest) {
-        try {
-            Optional<Goal> goalOptional =
-                    goalRepository.findByIdAndUser(changeGoalStatusRequest.getGoalId(), getUser());
-            if (goalOptional.isPresent()) {
-                Goal goal = goalOptional.get();
-                goal.setStatus(changeGoalStatusRequest.getStatus());
-                goalRepository.save(goal);
-                return true;
-            }
-            return false;
-        } catch (Exception e) {
-            log.error(e);
-            return false;
-        }
+    public Boolean changeGoalStatus(ChangeGoalStatusRequest request) {
+        return goalRepository.findByIdAndUser(request.getGoalId(), getUser())
+                .filter(goal -> {
+                    if (request.getEndDate() != null) {
+                        LocalDate newEndDate = request.getEndDate().toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate();
+                        if (newEndDate.isBefore(LocalDate.now())) {
+                            log.warn("Update rejected: endDate {} has already passed", newEndDate);
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .map(goal -> {
+                    boolean updated = false;
+
+                    if (request.getStatus() != null) {
+                        goal.setStatus(request.getStatus());
+                        updated = true;
+                    }
+
+                    if (request.getEndDate() != null) {
+                        LocalDate newEndDate = request.getEndDate().toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate();
+                        goal.setEndDate(newEndDate);
+                        updated = true;
+                    }
+
+                    if (request.getPriority() != null) {
+                        goal.setGoalPriority(request.getPriority());
+                        updated = true;
+                    }
+
+                    if (updated) {
+                        goalRepository.save(goal);
+                    }
+
+                    return updated;
+                })
+                .orElse(false);
     }
+
 
     private BigDecimal findMonthlyExpenseOfUser() {
         LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
