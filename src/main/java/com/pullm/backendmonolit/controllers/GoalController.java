@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,10 +39,20 @@ public class GoalController {
     @GetMapping("/all/{status}")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseDTO<GoalResponse> getGoalByStatus(@PathVariable("status") GoalStatus status) {
+    public ResponseDTO<GoalResponse> getGoalByStatus(@PathVariable("status") GoalStatus status,
+                                                     @RequestParam("count") Integer count) {
         return ResponseDTO.<GoalResponse>builder()
-                .data(goalService.getAllGoals(status)).build();
+                .data(goalService.getAllGoals(status, count)).build();
     }
+
+    @GetMapping("/history")
+    @ResponseStatus(code = HttpStatus.OK)
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseDTO<GoalResponse> getGoalHistory() {
+        return ResponseDTO.<GoalResponse>builder()
+                .data(goalService.getGoalHistory()).build();
+    }
+
 
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)

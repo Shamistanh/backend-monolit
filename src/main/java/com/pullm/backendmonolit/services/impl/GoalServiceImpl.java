@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -80,11 +81,19 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public GoalResponse getAllGoals(GoalStatus status) {
+    public GoalResponse getAllGoals(GoalStatus status, Integer count) {
         User user = getUser();
-        List<Goal> goals = (status != null)
-                ? goalRepository.findAllByUserAndStatus(user, status)
-                : goalRepository.findAllByUser(user);
+        List<Goal> goals;
+        if (count == null) {
+            goals = (status != null)
+                    ? goalRepository.findAllByUserAndStatus(user, status)
+                    : goalRepository.findAllByUser(user);
+        }else {
+            goals = (status != null)
+                    ? goalRepository.findAllByUserAndStatus(user, status, PageRequest.of(0, count))
+                    : goalRepository.findAllByUser(user, PageRequest.of(0, count));
+        }
+
 
         BigDecimal monthlyExpense = findMonthlyExpenseOfUser();
         BigDecimal monthlyIncome = findMonthlyIncomeOfUser();
@@ -215,6 +224,26 @@ public class GoalServiceImpl implements GoalService {
                     return updated;
                 })
                 .orElse(false);
+    }
+
+    @Override
+    public GoalResponse getGoalHistory() {
+        User user = getUser();
+        List<Goal> allByUserAndEndDateBefore = goalRepository.findAllByUserAndEndDateBefore(user, LocalDate.now());
+        List<GoalSingleResponse> goalSingleResponseList = new ArrayList<>();
+        allByUserAndEndDateBefore.forEach(goal -> {
+            goalSingleResponseList.add( GoalSingleResponse.builder()
+                .startDate(goal.getStartDate())
+                .endDate(goal.getEndDate())
+                .name(goal.getName())
+                .amount(goal.getAmount())
+                .status(goal.getStatus())
+                .build());
+        });
+        return GoalResponse.builder()
+                .userId(user.getId())
+                .goals(goalSingleResponseList.stream().sorted().toList())
+                .build();
     }
 
 

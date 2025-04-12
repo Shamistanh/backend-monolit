@@ -46,6 +46,9 @@ public class QrServiceImpl implements QrService {
 
     @Override
     public ProcessedReceipt processReceiptResponse(String fiscalId) {
+        if (fiscalId == null) {
+            return null;
+        }
         String imageUrl = ekassaUrl + fiscalId;
         try {
             return qrAiProcessorClient.processReceipt(new ProcessingReceipt(imageUrl));

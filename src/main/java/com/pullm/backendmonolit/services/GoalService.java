@@ -10,12 +10,14 @@ public interface GoalService {
 
     GoalSingleResponse getGoal(Long id);
 
-    GoalResponse getAllGoals(GoalStatus status);
+    GoalResponse getAllGoals(GoalStatus status, Integer count);
 
     String createGoal(GoalRequest goalRequest);
 
     Boolean deleteGoal(Long id);
 
     Boolean changeGoalStatus(ChangeGoalStatusRequest changeGoalStatusRequest);
+
+    GoalResponse getGoalHistory();
 
 }
