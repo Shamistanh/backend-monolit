@@ -184,7 +184,7 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public Boolean changeGoalStatus(ChangeGoalStatusRequest request) {
+    public Boolean changeGoal(ChangeGoalStatusRequest request) {
         return goalRepository.findByIdAndUser(request.getGoalId(), getUser())
                 .filter(goal -> {
                     if (request.getEndDate() != null) {
@@ -216,6 +216,11 @@ public class GoalServiceImpl implements GoalService {
 
                     if (request.getPriority() != null) {
                         goal.setGoalPriority(request.getPriority());
+                        updated = true;
+                    }
+
+                    if (request.getAmount() != null  && request.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+                        goal.setAmount(request.getAmount());
                         updated = true;
                     }
 

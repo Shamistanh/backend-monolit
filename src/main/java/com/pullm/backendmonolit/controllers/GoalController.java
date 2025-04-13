@@ -70,12 +70,12 @@ public class GoalController {
                 .data(goalService.createGoal(goalRequest)).build();
     }
 
-    @PutMapping("status-update")
+    @PutMapping("update")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseDTO<Boolean> changeGoalStatus(@RequestBody ChangeGoalStatusRequest changeGoalStatusRequest) {
         return ResponseDTO.<Boolean>builder()
-                .data(goalService.changeGoalStatus(changeGoalStatusRequest)).build();
+                .data(goalService.changeGoal(changeGoalStatusRequest)).build();
     }
 
 

@@ -16,7 +16,7 @@ public interface GoalService {
 
     Boolean deleteGoal(Long id);
 
-    Boolean changeGoalStatus(ChangeGoalStatusRequest changeGoalStatusRequest);
+    Boolean changeGoal(ChangeGoalStatusRequest changeGoalStatusRequest);
 
     GoalResponse getGoalHistory();
 
