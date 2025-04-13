@@ -10,6 +10,7 @@ import lombok.Data;
 @Builder
 @Data
 public class GoalSingleResponse {
+    private Long id;
     private GoalStatus status;
     private String name;
     private BigDecimal amount;

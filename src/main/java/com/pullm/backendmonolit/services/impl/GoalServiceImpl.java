@@ -105,6 +105,7 @@ public class GoalServiceImpl implements GoalService {
 
         for (Goal goal : goals) {
             GoalSingleResponse.GoalSingleResponseBuilder builder = GoalSingleResponse.builder()
+                    .id(goal.getId())
                     .startDate(goal.getStartDate())
                     .endDate(goal.getEndDate())
                     .name(goal.getName())
