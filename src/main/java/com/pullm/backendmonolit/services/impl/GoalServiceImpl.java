@@ -145,13 +145,25 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public String createGoal(GoalRequest goalRequest) {
+
+        GoalStatus requestedStatus = goalRequest.getStatus();
+
+        if (requestedStatus == GoalStatus.COMPLETED) {
+            return "You cannot create COMPLETED goal";
+        }
+
         User user = getUser();
+
         boolean alreadyHasActiveGoal = goalRepository.existsByUserAndGoalPriorityAndStatus(
                 user, goalRequest.getGoalPriority(), GoalStatus.ACTIVE);
 
-        GoalStatus targetStatus = (alreadyHasActiveGoal && goalRequest.getStatus() == GoalStatus.ACTIVE)
-                ? GoalStatus.PENDING
-                : GoalStatus.ACTIVE;
+        GoalStatus finalStatus;
+
+        if (requestedStatus == GoalStatus.ACTIVE && alreadyHasActiveGoal) {
+            finalStatus = GoalStatus.PENDING;
+        } else {
+            finalStatus = requestedStatus;
+        }
 
         Goal newGoal = Goal.builder()
                 .user(user)
@@ -160,15 +172,20 @@ public class GoalServiceImpl implements GoalService {
                 .startDate(LocalDate.now())
                 .endDate(goalRequest.getGoalEndDate())
                 .goalPriority(goalRequest.getGoalPriority())
-                .status(targetStatus)
+                .status(finalStatus)
                 .build();
 
         goalRepository.save(newGoal);
 
-        return targetStatus == GoalStatus.PENDING
+        if (requestedStatus == GoalStatus.PENDING) {
+            return "Your goal has been set to PENDING as requested.";
+        }
+
+        return finalStatus == GoalStatus.PENDING
                 ? "You already have an active goal with this priority, so the new goal is set to PENDING."
-                : "No active goal found with this priority, so the new goal is set to ACTIVE.";
+                : "Your goal has been set to ACTIVE.";
     }
+
 
 
 
