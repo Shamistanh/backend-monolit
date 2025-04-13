@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import liquibase.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,8 +47,8 @@ public class QrServiceImpl implements QrService {
 
     @Override
     public ProcessedReceipt processReceiptResponse(String fiscalId) {
-        if (fiscalId == null) {
-            return null;
+        if (StringUtil.isEmpty(fiscalId)) {
+            throw new IllegalArgumentException("fiscalId cannot be empty");
         }
         String imageUrl = ekassaUrl + fiscalId;
         try {
