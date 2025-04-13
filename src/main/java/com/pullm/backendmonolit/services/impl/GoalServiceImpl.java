@@ -75,6 +75,7 @@ public class GoalServiceImpl implements GoalService {
                 .amount(goal.getAmount())
                 .monthlyTotalExpenses(monthlyExpense)
                 .balance(balance)
+                .priority(goal.getGoalPriority())
                 .status(goal.getStatus())
                 .percentage(percentage)
                 .build();
@@ -110,6 +111,7 @@ public class GoalServiceImpl implements GoalService {
                     .amount(goal.getAmount())
                     .monthlyTotalExpenses(monthlyExpense)
                     .balance(balance)
+                    .priority(goal.getGoalPriority())
                     .status(goal.getStatus());
 
             if (goal.getStatus() == GoalStatus.ACTIVE) {
@@ -237,6 +239,7 @@ public class GoalServiceImpl implements GoalService {
                 .endDate(goal.getEndDate())
                 .name(goal.getName())
                 .amount(goal.getAmount())
+                .priority(goal.getGoalPriority())
                 .status(goal.getStatus())
                 .build());
         });
