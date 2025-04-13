@@ -215,8 +215,14 @@ public class GoalServiceImpl implements GoalService {
                     }
 
                     if (request.getPriority() != null) {
-                        goal.setGoalPriority(request.getPriority());
-                        updated = true;
+                        if (!goalRepository.existsByUserAndGoalPriorityAndStatus(getUser(), request.getPriority(),
+                                GoalStatus.ACTIVE)) {
+                            goal.setGoalPriority(request.getPriority());
+                            updated = true;
+                        } else {
+                           log.info("Goal with priority {} already exists", request.getPriority());
+                        }
+
                     }
 
                     if (request.getAmount() != null  && request.getAmount().compareTo(BigDecimal.ZERO) > 0) {
