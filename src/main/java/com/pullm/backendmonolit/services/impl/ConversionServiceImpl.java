@@ -104,7 +104,7 @@ public class ConversionServiceImpl implements ConversionService {
         try {
             Optional<User> userByEmail = userRepository.findUserByEmail(extractMobileNumber());
             return request.getHeader(ACCEPT_CURRENCY) == null ?
-                    userByEmail.map(User::getCurrency).orElse(null) :
+                    userByEmail.map(User::getCurrency).orElse(AZN) :
                     request.getHeader(ACCEPT_CURRENCY);
         } catch (Exception e) {
             log.error(e.getMessage());
