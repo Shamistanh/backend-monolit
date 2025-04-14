@@ -149,7 +149,7 @@ public class GoalServiceImpl implements GoalService {
         GoalStatus requestedStatus = goalRequest.getStatus();
 
         if (requestedStatus == GoalStatus.COMPLETED) {
-            return "You cannot create COMPLETED goal";
+           throw new RuntimeException("Goal with COMPLETED status can't be created");
         }
 
         User user = getUser();
