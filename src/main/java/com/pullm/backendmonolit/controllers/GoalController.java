@@ -36,10 +36,10 @@ public class GoalController {
                 .data(goalService.getGoal(id)).build();
     }
 
-    @GetMapping("/all/{status}")
+    @GetMapping("/all")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseDTO<GoalResponse> getGoalByStatus(@PathVariable(value = "status", required = false) GoalStatus status,
+    public ResponseDTO<GoalResponse> getGoalByStatus(@RequestParam(value = "status", required = false) GoalStatus status,
                                                      @RequestParam(value = "count", required = false) Integer count) {
         return ResponseDTO.<GoalResponse>builder()
                 .data(goalService.getAllGoals(status, count)).build();
