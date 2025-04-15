@@ -19,7 +19,7 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     List<Goal> findAllByUser(User userId);
 
-    List<Goal> findAllByUserAndEndDateBefore(User userId, LocalDate endDate);
+    List<Goal> findAllByUserAndEndDateBeforeOrStatus(User userId, LocalDate endDate, GoalStatus status);
 
     List<Goal> findAllByUser(User userId, Pageable pageable);
 

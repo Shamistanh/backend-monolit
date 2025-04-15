@@ -260,7 +260,8 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public GoalResponse getGoalHistory() {
         User user = getUser();
-        List<Goal> allByUserAndEndDateBefore = goalRepository.findAllByUserAndEndDateBefore(user, LocalDate.now());
+        List<Goal> allByUserAndEndDateBefore = goalRepository.findAllByUserAndEndDateBeforeOrStatus(user,
+                LocalDate.now(), GoalStatus.COMPLETED);
         List<GoalSingleResponse> goalSingleResponseList = new ArrayList<>();
         allByUserAndEndDateBefore.forEach(goal -> {
             goalSingleResponseList.add( GoalSingleResponse.builder()
