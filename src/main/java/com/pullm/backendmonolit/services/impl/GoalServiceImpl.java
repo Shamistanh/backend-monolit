@@ -265,6 +265,7 @@ public class GoalServiceImpl implements GoalService {
         List<GoalSingleResponse> goalSingleResponseList = new ArrayList<>();
         allByUserAndEndDateBefore.forEach(goal -> {
             goalSingleResponseList.add( GoalSingleResponse.builder()
+                .id(goal.getId())
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .name(goal.getName())
