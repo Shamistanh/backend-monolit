@@ -24,7 +24,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.PageRequest;
@@ -261,8 +260,8 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public GoalResponse getGoalHistory() {
         User user = getUser();
-        List<Goal> allByUserAndEndDateBefore = goalRepository.findAllByUser(user).stream().filter(goal -> goal.getEndDate()
-                .isBefore(LocalDate.now()) || goal.getStatus() == GoalStatus.COMPLETED).toList();
+        List<Goal> allByUserAndEndDateBefore = goalRepository.findAllByUserAndEndDateBeforeOrStatus(user,
+                LocalDate.now(), GoalStatus.COMPLETED);
         List<GoalSingleResponse> goalSingleResponseList = new ArrayList<>();
         allByUserAndEndDateBefore.forEach(goal -> {
             goalSingleResponseList.add( GoalSingleResponse.builder()
@@ -276,6 +275,7 @@ public class GoalServiceImpl implements GoalService {
         });
         return GoalResponse.builder()
                 .userId(user.getId())
+                .goals(goalSingleResponseList)
                 .build();
     }
 
