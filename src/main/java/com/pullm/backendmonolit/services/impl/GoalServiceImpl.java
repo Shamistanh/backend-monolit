@@ -4,10 +4,13 @@ import com.pullm.backendmonolit.entities.Goal;
 import com.pullm.backendmonolit.entities.Transaction;
 import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.entities.UserIncome;
+import com.pullm.backendmonolit.entities.enums.ProductSubType;
 import com.pullm.backendmonolit.enums.GoalStatus;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.request.ChangeGoalStatusRequest;
 import com.pullm.backendmonolit.models.request.GoalRequest;
+import com.pullm.backendmonolit.models.request.ProductRequest;
+import com.pullm.backendmonolit.models.request.TransactionRequest;
 import com.pullm.backendmonolit.models.response.GoalResponse;
 import com.pullm.backendmonolit.models.response.GoalSingleResponse;
 import com.pullm.backendmonolit.repository.GoalRepository;
@@ -22,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +43,8 @@ public class GoalServiceImpl implements GoalService {
     private final GoalRepository goalRepository;
 
     private final UserRepository userRepository;
+
+    private final TransactionsServiceImpl transactionsService;
 
     private final TransactionRepository transactionRepository;
 
@@ -203,7 +209,8 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public Boolean changeGoal(ChangeGoalStatusRequest request) {
-        return goalRepository.findByIdAndUser(request.getGoalId(), getUser())
+        User user = getUser();
+        return goalRepository.findByIdAndUser(request.getGoalId(), user)
                 .filter(goal -> {
                     if (request.getEndDate() != null) {
                         LocalDate newEndDate = request.getEndDate().toInstant()
@@ -221,6 +228,9 @@ public class GoalServiceImpl implements GoalService {
 
                     if (request.getStatus() != null) {
                         goal.setStatus(request.getStatus());
+                        if (request.getStatus() == GoalStatus.COMPLETED) {
+                            addToExpense(goal,request, user);
+                        }
                         updated = true;
                     }
 
@@ -233,7 +243,7 @@ public class GoalServiceImpl implements GoalService {
                     }
 
                     if (request.getPriority() != null) {
-                        if (!goalRepository.existsByUserAndGoalPriorityAndStatus(getUser(), request.getPriority(),
+                        if (!goalRepository.existsByUserAndGoalPriorityAndStatus(user, request.getPriority(),
                                 GoalStatus.ACTIVE)) {
                             goal.setGoalPriority(request.getPriority());
                             updated = true;
@@ -257,6 +267,17 @@ public class GoalServiceImpl implements GoalService {
                 .orElse(false);
     }
 
+    private void addToExpense(Goal goal, ChangeGoalStatusRequest request, User user) {
+        transactionsService.createTransaction(TransactionRequest.builder()
+                        .date(LocalDateTime.now())
+                        .products(List.of(ProductRequest.builder()
+                                        .price(request.getAmount())
+                                        .productSubType(ProductSubType.OTHER)
+                                        .name(goal.getName())
+                                .build()))
+                .build());
+    }
+
     @Override
     public GoalResponse getGoalHistory() {
         User user = getUser();
@@ -276,7 +297,8 @@ public class GoalServiceImpl implements GoalService {
         });
         return GoalResponse.builder()
                 .userId(user.getId())
-                .goals(goalSingleResponseList)
+                .goals(goalSingleResponseList.stream()
+                        .sorted(Comparator.comparing(GoalSingleResponse::getStartDate)).toList())
                 .build();
     }
 
