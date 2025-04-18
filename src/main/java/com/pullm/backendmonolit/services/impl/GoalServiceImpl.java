@@ -297,8 +297,7 @@ public class GoalServiceImpl implements GoalService {
         });
         return GoalResponse.builder()
                 .userId(user.getId())
-                .goals(goalSingleResponseList.stream()
-                        .sorted(Comparator.comparing(GoalSingleResponse::getStartDate)).toList())
+                .goals(goalSingleResponseList)
                 .build();
     }
 
