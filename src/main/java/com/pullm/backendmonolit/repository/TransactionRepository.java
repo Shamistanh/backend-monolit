@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     List<Transaction> findAllByUserIdAndDateBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate);
+
+    List<Transaction> findAllByUserId(Long userId);
 }
