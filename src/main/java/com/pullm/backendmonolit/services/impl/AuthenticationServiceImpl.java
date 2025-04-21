@@ -72,6 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .isEnabled(Boolean.FALSE)
                 .email(request.getEmail())
                 .fullName(request.getFullName())
+                .currency(request.getCurrency())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 

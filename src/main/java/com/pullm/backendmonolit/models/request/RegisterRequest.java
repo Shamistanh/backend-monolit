@@ -26,6 +26,8 @@ public class RegisterRequest {
     @NotEmpty(message = "Email cannot be empty")
     private String email;
 
+    private String currency;
+
     @NotEmpty(message = "Password cannot be empty")
     @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
     private String password;
