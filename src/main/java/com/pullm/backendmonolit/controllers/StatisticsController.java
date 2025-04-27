@@ -3,7 +3,6 @@ package com.pullm.backendmonolit.controllers;
 import com.pullm.backendmonolit.entities.enums.ProductSubType;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.enums.DateRange;
-import com.pullm.backendmonolit.models.response.GoalSingleResponse;
 import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.models.response.StatisticsDetail;
 import com.pullm.backendmonolit.models.response.StatisticsProductResponse;
