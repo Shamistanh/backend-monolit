@@ -39,7 +39,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8_ENCODING);
             helper.setPriority(1);
             helper.setSubject(subject);
-            helper.setFrom("ucon.office@gmail.com");
+            helper.setFrom("office.vvaly@gmail.com");
             helper.setTo(user.getEmail());
             helper.setText(text, true);
             mailSender.send(message);

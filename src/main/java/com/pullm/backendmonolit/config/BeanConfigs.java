@@ -15,8 +15,8 @@ public class BeanConfigs {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
 
-        mailSender.setUsername("ucon.office@gmail.com");
-        mailSender.setPassword("wbxsfsqmcfgvyxvt");
+        mailSender.setUsername("office.vvaly@gmail.com");
+        mailSender.setPassword("btyc ohgz fzpc nvmp");
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
