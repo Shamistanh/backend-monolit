@@ -6,11 +6,9 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class TransactionRequest {
     private String storeName;
@@ -18,5 +16,9 @@ public class TransactionRequest {
     private LocalDateTime date;
     private String currency;
     private List<ProductRequest> products;
+
+    public TransactionRequest() {
+        this.currency = "AZN";
+    }
 
 }
