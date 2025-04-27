@@ -10,6 +10,7 @@ import com.pullm.backendmonolit.services.QrService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -70,11 +71,15 @@ public class QrServiceImpl implements QrService {
 
     private void addVatCashbackAmount(ProcessedReceipt processedReceipt) {
         ProcessedReceipt.PaymentType paymentType = processedReceipt.getPaymentType();
-        if (BigDecimal.ZERO.equals(paymentType.getCash()) && !BigDecimal.ZERO.equals(paymentType.getCashless())) {
-            processedReceipt.setVatCashbackAmount(paymentType.getCashless().multiply(cashlessRate));
-        } else if (BigDecimal.ZERO.equals(paymentType.getCashless()) && !BigDecimal.ZERO
-                .equals(paymentType.getCash())) {
-            processedReceipt.setVatCashbackAmount(paymentType.getCash().multiply(cashRate));
+        if (BigDecimal.ZERO.compareTo(paymentType.getCash()) == 0
+            && BigDecimal.ZERO.compareTo(paymentType.getCashless()) != 0) {
+            processedReceipt.setVatCashbackAmount(paymentType.getCashless().multiply(cashlessRate)
+                    .divide(BigDecimal.valueOf(100),
+                    RoundingMode.HALF_UP));
+        } else if (BigDecimal.ZERO.compareTo(paymentType.getCashless()) == 0
+                && BigDecimal.ZERO.compareTo(paymentType.getCash()) != 0) {
+            processedReceipt.setVatCashbackAmount(paymentType.getCash().multiply(cashRate).divide(BigDecimal.valueOf(100),
+                    RoundingMode.HALF_UP));
         }
     }
 
