@@ -28,4 +28,13 @@ public class DetailsController {
         return ResponseEntity.ok("Profile picture uploaded");
     }
 
+    @PostMapping("/edit-details")
+    @ResponseStatus(code = HttpStatus.OK)
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity<String> editDetails(@RequestParam("file") MultipartFile file) throws IOException {
+        userDetailsService.uploadProfileImage(file);
+        return ResponseEntity.ok("Details edited successfully");
+    }
+
+
 }
