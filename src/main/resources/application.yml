@@ -64,5 +64,10 @@ management:
 #  level:
 #    root: debug
 
+vat:
+  cashback-rates:
+    cash: 5
+    cashless: 17.5
+
 ekassa:
   url: "https://monitoring.e-kassa.gov.az/pks-monitoring/2.0.0/documents/"

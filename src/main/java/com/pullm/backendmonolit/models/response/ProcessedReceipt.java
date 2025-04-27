@@ -21,6 +21,9 @@ public class ProcessedReceipt {
     @JsonProperty("total_amount")
     private BigDecimal totalAmount;
 
+    @JsonProperty("vat_cashback_amount")
+    private BigDecimal vatCashbackAmount;
+
     @JsonProperty("total_tax")
     private BigDecimal totalTax;
 

@@ -9,6 +9,7 @@ import com.pullm.backendmonolit.models.response.Receipt;
 import com.pullm.backendmonolit.services.QrService;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -33,6 +34,12 @@ public class QrServiceImpl implements QrService {
     @Value("${ekassa.url}")
     private String ekassaUrl;
 
+    @Value("${vat.cashback-rates.cash}")
+    private BigDecimal cashRate;
+
+    @Value("${vat.cashback-rates.cashless}")
+    private BigDecimal cashlessRate;
+
     @Override
     public Receipt getReceiptResponse(String fiscalId) {
         String imageUrl = ekassaUrl + fiscalId;
@@ -52,11 +59,23 @@ public class QrServiceImpl implements QrService {
         }
         String imageUrl = ekassaUrl + fiscalId;
         try {
-            return qrAiProcessorClient.processReceipt(new ProcessingReceipt(imageUrl));
+            ProcessedReceipt processedReceipt = qrAiProcessorClient.processReceipt(new ProcessingReceipt(imageUrl));
+            addVatCashbackAmount(processedReceipt);
+            return processedReceipt;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void addVatCashbackAmount(ProcessedReceipt processedReceipt) {
+        ProcessedReceipt.PaymentType paymentType = processedReceipt.getPaymentType();
+        if (BigDecimal.ZERO.equals(paymentType.getCash()) && !BigDecimal.ZERO.equals(paymentType.getCashless())) {
+            processedReceipt.setVatCashbackAmount(paymentType.getCashless().multiply(cashlessRate));
+        } else if (BigDecimal.ZERO.equals(paymentType.getCashless()) && !BigDecimal.ZERO
+                .equals(paymentType.getCash())) {
+            processedReceipt.setVatCashbackAmount(paymentType.getCash().multiply(cashRate));
+        }
     }
 
 
