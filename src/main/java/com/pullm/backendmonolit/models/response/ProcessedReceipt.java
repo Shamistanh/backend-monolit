@@ -32,7 +32,7 @@ public class ProcessedReceipt {
         @JsonProperty("product_type")
         private String productType;
 
-        private int quantity;
+        private BigDecimal quantity;
 
         @JsonProperty("product_measurement")
         private String productMeasurement;
