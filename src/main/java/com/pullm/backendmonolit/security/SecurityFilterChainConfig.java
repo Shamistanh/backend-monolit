@@ -33,7 +33,7 @@ public class SecurityFilterChainConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("v1/auths/**").permitAll()
+                        auth.requestMatchers("v1/auths/**", "v1/currency/all").permitAll()
                                 .requestMatchers("swagger-ui/**", "v3/api-docs/**").permitAll()
                                 .requestMatchers("swagger-ui.html").permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()

@@ -25,7 +25,6 @@ public class CurrencyController {
 
     @GetMapping("/all")
     @ResponseStatus(code = HttpStatus.OK)
-    @SecurityRequirement(name = "Bearer Authentication")
     public List<CurrencyResponse> getAvailableCurrencies() {
         return conversionService.getAvailableCurrencies();
     }
