@@ -16,6 +16,7 @@ public class TransactionRequest {
     private String storeName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", shape = JsonFormat.Shape.STRING)
     private LocalDateTime date;
+    private String currency;
     private List<ProductRequest> products;
 
 }

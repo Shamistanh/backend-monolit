@@ -124,6 +124,11 @@ public class ConversionServiceImpl implements ConversionService {
         return Pair.of(getCurrency(), exchangeRateClient.getExchangeRates().getRates().get(getCurrency()));
     }
 
+    @Override
+    public Pair<String, Double> getCurrency(String currency) {
+        return Pair.of(getCurrency(), exchangeRateClient.getExchangeRates().getRates().get(currency));
+    }
+
     private User getUser() {
         var number = extractMobileNumber();
         var user = userRepository.findUserByEmail(number)

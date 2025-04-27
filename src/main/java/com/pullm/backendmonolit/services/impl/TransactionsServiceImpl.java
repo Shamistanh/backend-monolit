@@ -55,20 +55,20 @@ public class TransactionsServiceImpl {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Pair<String, Double> currentCurrency = conversionService.getCurrentCurrency();
+        Pair<String, Double> currency = conversionService.getCurrency(transaction.getCurrency());
         var user = getUser();
         transaction.setUser(user);
         transaction.setTransactionType(TransactionType.MANUAL);
         transaction.setTotalAmount(
-                totalAmount.divide(BigDecimal.valueOf(currentCurrency.getSecond()), RoundingMode.HALF_UP));
-        transaction.setRate(currentCurrency.getSecond());
-        transaction.setCurrency(currentCurrency.getFirst());
+                totalAmount.divide(BigDecimal.valueOf(currency.getSecond()), RoundingMode.HALF_UP));
+        transaction.setRate(currency.getSecond());
+        transaction.setCurrency(transaction.getCurrency());
 
         transaction.getProducts().forEach(product -> {
             ProductType productType = findProductTypeBySubType(product.getProductSubType());
             product.setProductType(productType);
             product.setPrice(
-                    product.getPrice().divide(BigDecimal.valueOf(currentCurrency.getSecond()), RoundingMode.HALF_UP));
+                    product.getPrice().divide(BigDecimal.valueOf(currency.getSecond()), RoundingMode.HALF_UP));
             product.setTransaction(transaction);
         });
 

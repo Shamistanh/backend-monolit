@@ -16,4 +16,6 @@ public interface ConversionService {
 
     Pair<String, Double> getCurrentCurrency();
 
+    Pair<String, Double> getCurrency(String currency);
+
 }

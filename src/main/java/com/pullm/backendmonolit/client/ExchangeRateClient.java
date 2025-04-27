@@ -1,6 +1,7 @@
 package com.pullm.backendmonolit.client;
 
 import com.pullm.backendmonolit.models.response.ExchangeRateResponse;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -8,5 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public interface ExchangeRateClient {
 
     @GetMapping("/AZN")
+    @Cacheable("aznrates")
     ExchangeRateResponse getExchangeRates();
 }
