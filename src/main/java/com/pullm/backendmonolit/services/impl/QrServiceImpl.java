@@ -71,13 +71,14 @@ public class QrServiceImpl implements QrService {
 
     private void addVatCashbackAmount(ProcessedReceipt processedReceipt) {
         ProcessedReceipt.PaymentType paymentType = processedReceipt.getPaymentType();
+        BigDecimal totalTax = processedReceipt.getTotalTax();
         if (BigDecimal.ZERO.compareTo(paymentType.getCash()) == 0
             && BigDecimal.ZERO.compareTo(paymentType.getCashless()) != 0) {
-            processedReceipt.setVatCashbackAmount(paymentType.getCashless().multiply(cashlessRate)
+            processedReceipt.setVatCashbackAmount(totalTax.multiply(cashlessRate)
                     .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
         } else if (BigDecimal.ZERO.compareTo(paymentType.getCashless()) == 0
                 && BigDecimal.ZERO.compareTo(paymentType.getCash()) != 0) {
-            processedReceipt.setVatCashbackAmount(paymentType.getCash().multiply(cashRate)
+            processedReceipt.setVatCashbackAmount(totalTax.multiply(cashRate)
                     .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
         }
     }
