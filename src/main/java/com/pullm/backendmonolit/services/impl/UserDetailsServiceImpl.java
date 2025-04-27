@@ -2,9 +2,12 @@ package com.pullm.backendmonolit.services.impl;
 
 import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.exception.NotFoundException;
+import com.pullm.backendmonolit.models.request.UserDetailsRequest;
+import com.pullm.backendmonolit.models.response.UserDetailsResponse;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.UserDetailsService;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,32 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.getDetail().setProfileImageId(Arrays.toString(file.getBytes()));
         userRepository.save(user);
         log.info("User profile image uploaded");
+    }
+
+    @Override
+    public void updateUserDetails(UserDetailsRequest userDetailsRequest) {
+        User user = getUser();
+        String fullName = userDetailsRequest.getFullName();
+        if (fullName != null) {
+            user.setFullName(fullName);
+        }
+        LocalDate birthday = userDetailsRequest.getBirthday();
+        if (birthday != null) {
+            user.getDetail().setBirthday(birthday);
+        }
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserDetailsResponse getUserDetails() {
+        User user = getUser();
+        UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+        userDetailsResponse.setFullName(user.getFullName());
+        userDetailsResponse.setEmail(user.getEmail());
+        userDetailsResponse.setBirthday(user.getDetail() != null ? user.getDetail().getBirthday() : null);
+        userDetailsResponse.setId(user.getId());
+        userDetailsResponse.setIsEnabled(user.getIsEnabled());
+        return userDetailsResponse;
     }
 
 
