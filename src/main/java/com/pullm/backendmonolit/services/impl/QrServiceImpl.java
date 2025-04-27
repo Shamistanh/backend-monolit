@@ -74,12 +74,11 @@ public class QrServiceImpl implements QrService {
         if (BigDecimal.ZERO.compareTo(paymentType.getCash()) == 0
             && BigDecimal.ZERO.compareTo(paymentType.getCashless()) != 0) {
             processedReceipt.setVatCashbackAmount(paymentType.getCashless().multiply(cashlessRate)
-                    .divide(BigDecimal.valueOf(100),
-                    RoundingMode.HALF_UP));
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
         } else if (BigDecimal.ZERO.compareTo(paymentType.getCashless()) == 0
                 && BigDecimal.ZERO.compareTo(paymentType.getCash()) != 0) {
-            processedReceipt.setVatCashbackAmount(paymentType.getCash().multiply(cashRate).divide(BigDecimal.valueOf(100),
-                    RoundingMode.HALF_UP));
+            processedReceipt.setVatCashbackAmount(paymentType.getCash().multiply(cashRate)
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
         }
     }
 
