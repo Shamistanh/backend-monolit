@@ -12,9 +12,9 @@ spring:
       spec: maximumSize=1000,expireAfterWrite=100m
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres
-    username: postgres.elmebsnxttzjxngthlsu
-    password: postgresPW97
+    url: jdbc:postgresql://database-1.c7yisq0we0j2.eu-north-1.rds.amazonaws.com:5432/postgres
+    username: postgres
+    password: vpjxLs6TxG2gdJHwnW6m
 #    url: jdbc:h2:mem:pullm
 #    username: sa
 #    password: password
