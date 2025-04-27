@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -108,6 +109,7 @@ public class TransactionsServiceImpl {
                 dateTimePair.getSecond());
         var transactionRequests = transactionMapper.mapToTransactionResponseList(transactions);
 
+        transactionRequests.sort(Comparator.comparing(TransactionResponse::getDate));
         log.info("getAllTransactions().end");
 
         return transactionRequests;
