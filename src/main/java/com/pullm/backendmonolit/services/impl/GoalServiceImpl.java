@@ -26,7 +26,9 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -90,24 +92,43 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public GoalResponse getAllGoals(GoalStatus status, Integer count) {
         User user = getUser();
-        List<Goal> goals;
-        if (count == null) {
-            goals = (status != null)
-                    ? goalRepository.findAllByUserAndStatus(user, status)
-                    : goalRepository.findAllByUser(user);
-        }else {
-            goals = (status != null)
-                    ? goalRepository.findAllByUserAndStatus(user, status, PageRequest.of(0, count))
-                    : goalRepository.findAllByUser(user, PageRequest.of(0, count));
-        }
-
+        List<Goal> goals = getGoals(status, count, user);
 
         BigDecimal monthlyExpense = findMonthlyExpenseOfUser();
         BigDecimal monthlyIncome = findMonthlyIncomeOfUser();
         BigDecimal balance = monthlyIncome.subtract(monthlyExpense);
-
-        List<GoalSingleResponse> responses = new ArrayList<>();
         BigDecimal remainingBalance = balance;
+
+        // Step 1: Sort ACTIVE goals by priority (HIGH → MEDIUM → LOW)
+        List<Goal> activeGoals = goals.stream()
+                .filter(g -> g.getStatus() == GoalStatus.ACTIVE)
+                .sorted(Comparator.comparing(Goal::getGoalPriority)) // Enum order must be HIGH < MEDIUM < LOW
+                .toList();
+
+        // Step 2: Allocate balance by priority
+        Map<Long, Integer> goalPercentageMap = new HashMap<>();
+
+        for (Goal goal : activeGoals) {
+            int percentage = 0;
+
+            if (remainingBalance.compareTo(BigDecimal.ZERO) > 0) {
+                if (remainingBalance.compareTo(goal.getAmount()) >= 0) {
+                    percentage = 100;
+                    remainingBalance = remainingBalance.subtract(goal.getAmount());
+                } else {
+                    percentage = Math.round(remainingBalance
+                            .divide(goal.getAmount(), 4, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(100))
+                            .floatValue());
+                    remainingBalance = BigDecimal.ZERO;
+                }
+            }
+
+            goalPercentageMap.put(goal.getId(), percentage);
+        }
+
+        // Step 3: Build responses
+        List<GoalSingleResponse> responses = new ArrayList<>();
 
         for (Goal goal : goals) {
             GoalSingleResponse.GoalSingleResponseBuilder builder = GoalSingleResponse.builder()
@@ -122,20 +143,7 @@ public class GoalServiceImpl implements GoalService {
                     .status(goal.getStatus());
 
             if (goal.getStatus() == GoalStatus.ACTIVE) {
-                int percentage = 0;
-
-                if (remainingBalance.compareTo(BigDecimal.ZERO) > 0) {
-                    if (remainingBalance.compareTo(goal.getAmount()) >= 0) {
-                        percentage = 100;
-                        remainingBalance = remainingBalance.subtract(goal.getAmount());
-                    } else {
-                        percentage = Math.round(remainingBalance
-                                .divide(goal.getAmount(), 4, RoundingMode.HALF_UP)
-                                .multiply(BigDecimal.valueOf(100))
-                                .floatValue());
-                    }
-                }
-
+                int percentage = goalPercentageMap.getOrDefault(goal.getId(), 0);
                 builder.percentage(percentage);
             }
 
@@ -146,6 +154,20 @@ public class GoalServiceImpl implements GoalService {
                 .userId(user.getId())
                 .goals(responses)
                 .build();
+    }
+
+    private List<Goal> getGoals(GoalStatus status, Integer count, User user) {
+        List<Goal> goals;
+        if (count == null) {
+            goals = (status != null)
+                    ? goalRepository.findAllByUserAndStatus(user, status)
+                    : goalRepository.findAllByUser(user);
+        } else {
+            goals = (status != null)
+                    ? goalRepository.findAllByUserAndStatus(user, status, PageRequest.of(0, count))
+                    : goalRepository.findAllByUser(user, PageRequest.of(0, count));
+        }
+        return goals;
     }
 
 
@@ -270,6 +292,7 @@ public class GoalServiceImpl implements GoalService {
     private void addToExpense(Goal goal, ChangeGoalStatusRequest request, User user) {
         transactionsService.createTransaction(TransactionRequest.builder()
                         .date(LocalDateTime.now())
+                .currency("AZN")
                         .products(List.of(ProductRequest.builder()
                                         .price(request.getAmount())
                                         .productSubType(ProductSubType.OTHER)
