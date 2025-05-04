@@ -5,6 +5,7 @@ import com.pullm.backendmonolit.client.ExchangeRateClient;
 import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.models.request.CurrencyRequest;
+import com.pullm.backendmonolit.models.response.CountryResponse;
 import com.pullm.backendmonolit.models.response.CurrencyResponse;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.ConversionService;
@@ -79,9 +80,11 @@ public class ConversionServiceImpl implements ConversionService {
         List<CurrencyResponse> currencies = new ArrayList<>();
         exchangeRateClient.getExchangeRates().getRates().forEach((k, v) -> {
                     if (CURRENCIES.contains(k)) {
+                        Pair<String, String> countryDetails = getCountryDetails(k);
                         currencies.add(CurrencyResponse.builder()
-                                .flag(getCountryFlag(k))
+                                .flag(countryDetails != null ? countryDetails.getFirst() : "")
                                 .currencyCode(k)
+                                .symbol(countryDetails != null ? countryDetails.getSecond() : "")
                                 .rate(v)
                                 .build());
                     }
@@ -89,6 +92,16 @@ public class ConversionServiceImpl implements ConversionService {
 
         );
         return currencies;
+    }
+
+    private Pair<String, String> getCountryDetails(String k) {
+        try {
+            List<CountryResponse> country = countryClient.getCountry(k);
+            return Pair.of(country.get(0).getFlags().getPng(), country.get(0).getCurrencies().get(k).getSymbol());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
     }
 
     private String getCountryFlag(String k) {
