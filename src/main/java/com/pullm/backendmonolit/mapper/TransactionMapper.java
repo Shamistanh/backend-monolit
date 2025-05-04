@@ -64,6 +64,7 @@ public interface TransactionMapper {
                                         .map(product -> {
                                             var productResponse = new ProductResponse();
                                             productResponse.setName(product.getName());
+                                            productResponse.setIcon(product.getProductType().getIcon());
                                             productResponse.setPrice(product.getPrice().multiply(
                                                     BigDecimal.valueOf(product.getTransaction().getRate())));
                                             productResponse.setQuantity(
