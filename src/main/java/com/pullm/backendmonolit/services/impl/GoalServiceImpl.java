@@ -252,7 +252,7 @@ public class GoalServiceImpl implements GoalService {
                     if (request.getStatus() != null) {
                         goal.setStatus(request.getStatus());
                         if (request.getStatus() == GoalStatus.COMPLETED) {
-                            addToExpense(goal,request, user);
+                            addToExpense(goal);
                         }
                         updated = true;
                     }
@@ -290,12 +290,12 @@ public class GoalServiceImpl implements GoalService {
                 .orElse(false);
     }
 
-    private void addToExpense(Goal goal, ChangeGoalStatusRequest request, User user) {
+    private void addToExpense(Goal goal) {
         transactionsService.createTransaction(TransactionRequest.builder()
                         .date(LocalDateTime.now())
                 .currency("AZN")
                         .products(List.of(ProductRequest.builder()
-                                        .price(request.getAmount())
+                                        .price(goal.getAmount())
                                         .productSubType(ProductSubType.OTHER)
                                         .name(goal.getName())
                                 .build()))
