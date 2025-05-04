@@ -20,6 +20,7 @@ import static com.pullm.backendmonolit.entities.enums.ProductSubType.HOTEL;
 import static com.pullm.backendmonolit.entities.enums.ProductSubType.INSURANCE;
 import static com.pullm.backendmonolit.entities.enums.ProductSubType.INVESTMENT;
 import static com.pullm.backendmonolit.entities.enums.ProductSubType.LOTTERY;
+import static com.pullm.backendmonolit.entities.enums.ProductSubType.OTHER;
 import static com.pullm.backendmonolit.entities.enums.ProductSubType.PARKING;
 import static com.pullm.backendmonolit.entities.enums.ProductSubType.PENALTY;
 import static com.pullm.backendmonolit.entities.enums.ProductSubType.PETS;
@@ -53,7 +54,7 @@ public class Constants {
             LIFE_AND_ENTERTAINMENT, List.of(HEALTH_CARE, FITNESS, EDUCATION, HOBBIES, LOTTERY, HOTEL),
             HOUSING_AND_VEHICLE, List.of(RENT, UTILITY, REPAIR, FUEL, PARKING),
             TRANSPORT, List.of(PUBLIC_TRANSPORT, TAXI, FLIGHTS),
-            OTHERS, List.of(TAXES, INSURANCE, PENALTY, CHARITY, INVESTMENT, BANKING)
+            OTHERS, List.of(TAXES, INSURANCE, PENALTY, CHARITY, INVESTMENT, BANKING, OTHER)
     );
 
     public static List<ProductSubType> findProductTypeByType(ProductType productType) {
