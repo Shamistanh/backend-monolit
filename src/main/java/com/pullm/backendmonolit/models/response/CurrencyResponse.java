@@ -8,5 +8,6 @@ import lombok.Data;
 public class CurrencyResponse {
     private String flag;
     private String currencyCode;
+    private String symbol;
     private Double rate;
 }

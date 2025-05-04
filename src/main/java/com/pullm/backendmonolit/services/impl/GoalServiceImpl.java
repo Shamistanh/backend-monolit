@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -146,9 +147,9 @@ public class GoalServiceImpl implements GoalService {
                 int percentage = goalPercentageMap.getOrDefault(goal.getId(), 0);
                 builder.percentage(percentage);
             }
-
             responses.add(builder.build());
         }
+        Collections.sort(responses);
 
         return GoalResponse.builder()
                 .userId(user.getId())
