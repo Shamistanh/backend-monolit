@@ -5,10 +5,11 @@ import com.pullm.backendmonolit.entities.enums.ProductSubType;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.enums.DateRange;
 import com.pullm.backendmonolit.exception.NotFoundException;
+import com.pullm.backendmonolit.mapper.StatisticsMapper;
 import com.pullm.backendmonolit.models.response.ChartSingleResponse;
 import com.pullm.backendmonolit.models.response.StatisticsCategory;
 import com.pullm.backendmonolit.models.response.StatisticsDetail;
-import com.pullm.backendmonolit.models.response.StatisticsProductResponse;
+import com.pullm.backendmonolit.models.response.StatisticsProductResponseDto;
 import com.pullm.backendmonolit.repository.ProductRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import com.pullm.backendmonolit.services.StatisticsService;
@@ -34,6 +35,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private final UserRepository userRepository;
 
+    private final StatisticsMapper statisticsMapper;
+
     @Override
     public StatisticsDetail getStatisticsDetail(DateRange dateRange, LocalDateTime startDate, LocalDateTime endDate) {
         StatisticsDetail statisticsDetail = null;
@@ -46,8 +49,10 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<StatisticsProductResponse> getProductDetails(ProductSubType productSubType, ProductType productType) {
-        return productRepository.findAllByProductTypeAndSubtype(productSubType,productType, getUser());
+    public List<StatisticsProductResponseDto> getProductDetails(ProductSubType productSubType,
+                                                                ProductType productType) {
+        return productRepository.findAllByProductTypeAndSubtype(productSubType, productType, getUser()).stream().map(
+                statisticsMapper::mapToStatisticsResponseDto).toList();
     }
 
     private StatisticsDetail getYearlyData(LocalDateTime startDate, LocalDateTime endDate) {

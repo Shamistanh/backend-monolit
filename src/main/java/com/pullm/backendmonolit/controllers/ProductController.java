@@ -5,7 +5,7 @@ import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.ProductRequest;
 import com.pullm.backendmonolit.models.response.ChartResponseWrapper;
-import com.pullm.backendmonolit.models.response.PopularProductResponse;
+import com.pullm.backendmonolit.models.response.PopularProductResponseDto;
 import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.services.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -38,8 +38,8 @@ public class ProductController {
     @GetMapping("/popular/{limit}")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseDTO<List<PopularProductResponse>> getPopularProducts(@PathVariable("limit") int limit) {
-        return ResponseDTO.<List<PopularProductResponse>>builder()
+    public ResponseDTO<List<PopularProductResponseDto>> getPopularProducts(@PathVariable("limit") int limit) {
+        return ResponseDTO.<List<PopularProductResponseDto>>builder()
                 .data(productService.getPopularProducts(limit)).build();
     }
 
