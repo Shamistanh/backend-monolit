@@ -111,7 +111,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 p.name,
                 p.price,
                 p.weight,      
-                p.count,
+                p.count, 
+                p.productType,          
                 p.productSubType)
                     FROM
                 Transaction t

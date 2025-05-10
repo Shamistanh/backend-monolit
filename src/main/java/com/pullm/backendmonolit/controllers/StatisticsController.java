@@ -5,7 +5,7 @@ import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.enums.DateRange;
 import com.pullm.backendmonolit.models.response.ResponseDTO;
 import com.pullm.backendmonolit.models.response.StatisticsDetail;
-import com.pullm.backendmonolit.models.response.StatisticsProductResponse;
+import com.pullm.backendmonolit.models.response.StatisticsProductResponseDto;
 import com.pullm.backendmonolit.services.StatisticsService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.LocalDateTime;
@@ -38,9 +38,11 @@ public class StatisticsController {
     @GetMapping("/products")
     @ResponseStatus(code = HttpStatus.OK)
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseDTO<List<StatisticsProductResponse>> getProducts(@RequestParam(required = false) ProductSubType productSubType, @RequestParam
+    public ResponseDTO<List<StatisticsProductResponseDto>> getProducts(
+            @RequestParam(required = false) ProductSubType productSubType, @RequestParam
     ProductType productType) {
-        return ResponseDTO.<List<StatisticsProductResponse>>builder().data(statisticsService.getProductDetails(productSubType,
+        return ResponseDTO.<List<StatisticsProductResponseDto>>builder()
+                .data(statisticsService.getProductDetails(productSubType,
                 productType)).build();
     }
 

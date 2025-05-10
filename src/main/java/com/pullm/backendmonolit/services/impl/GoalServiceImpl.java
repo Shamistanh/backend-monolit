@@ -292,6 +292,7 @@ public class GoalServiceImpl implements GoalService {
 
     private void addToExpense(Goal goal) {
         transactionsService.createTransaction(TransactionRequest.builder()
+                        .storeName("Goals store " + goal.getName())
                         .date(LocalDateTime.now())
                 .currency("AZN")
                         .products(List.of(ProductRequest.builder()

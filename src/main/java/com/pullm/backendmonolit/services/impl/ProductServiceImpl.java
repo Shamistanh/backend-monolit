@@ -5,11 +5,13 @@ import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.entities.enums.ProductSubType;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.exception.NotFoundException;
+import com.pullm.backendmonolit.mapper.ProductMapper;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.ProductRequest;
 import com.pullm.backendmonolit.models.response.ChartResponse;
 import com.pullm.backendmonolit.models.response.ChartResponseWrapper;
 import com.pullm.backendmonolit.models.response.PopularProductResponse;
+import com.pullm.backendmonolit.models.response.PopularProductResponseDto;
 import com.pullm.backendmonolit.repository.ProductRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
 import java.math.BigDecimal;
@@ -37,6 +39,7 @@ public class ProductServiceImpl {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
 
     public ChartResponseWrapper getAllChartResponse(DateCriteria dateCriteria) {
@@ -121,9 +124,9 @@ public class ProductServiceImpl {
         return userDetails.getUsername();
     }
 
-    public List<PopularProductResponse> getPopularProducts(int limit) {
+    public List<PopularProductResponseDto> getPopularProducts(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
-        return productRepository.getPopularProduct(getUser(), pageable);
+        return productRepository.getPopularProduct(getUser(), pageable).stream().map(productMapper::mapToPopularProductResponseDto).toList();
     }
 
     public List<ProductSubType> getProductSubType(ProductType productType) {
