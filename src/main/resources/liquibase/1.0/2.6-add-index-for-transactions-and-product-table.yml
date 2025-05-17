@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-indexes-for-products-and-transactions-query
+      author: shamistanhuseynov
+      changes:
+        - createIndex:
+            indexName: idx_products_product_type
+            tableName: products
+            columns:
+              - column:
+                  name: product_type
+
+        - createIndex:
+            indexName: idx_products_transaction_id
+            tableName: products
+            columns:
+              - column:
+                  name: transaction_id
+
+        - createIndex:
+            indexName: idx_transactions_user_id
+            tableName: transactions
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            indexName: idx_transactions_date
+            tableName: transactions
+            columns:
+              - column:
+                  name: date
+
+        - createIndex:
+            indexName: idx_products_name
+            tableName: products
+            columns:
+              - column:
+                  name: name
+
+
+        - createIndex:
+            indexName: idx_products_name_type
+            tableName: products
+            columns:
+              - column:
+                  name: name
+              - column:
+                  name: product_type
+
+        - createIndex:
+            indexName: idx_products_product_sub_type
+            tableName: products
+            columns:
+              - column:
+                  name: product_sub_type
+
+
+        - createIndex:
+            indexName: idx_products_type_and_sub_type
+            tableName: products
+            columns:
+              - column:
+                  name: product_type
+              - column:
+                  name: product_sub_type

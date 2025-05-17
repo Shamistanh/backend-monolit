@@ -1,19 +1,17 @@
 package com.pullm.backendmonolit.services.impl;
 
 import static com.pullm.backendmonolit.consatnts.Constants.findProductTypeBySubType;
-import static com.pullm.backendmonolit.enums.DateRange.DAILY;
-import static com.pullm.backendmonolit.enums.DateRange.MONTHLY;
-import static com.pullm.backendmonolit.enums.DateRange.YEARLY;
 
 import com.pullm.backendmonolit.entities.Product;
 import com.pullm.backendmonolit.entities.User;
 import com.pullm.backendmonolit.entities.enums.ProductType;
 import com.pullm.backendmonolit.entities.enums.TransactionType;
-import com.pullm.backendmonolit.enums.DateRange;
 import com.pullm.backendmonolit.exception.NotFoundException;
 import com.pullm.backendmonolit.mapper.TransactionMapper;
 import com.pullm.backendmonolit.models.criteria.DateCriteria;
 import com.pullm.backendmonolit.models.request.TransactionRequest;
+import com.pullm.backendmonolit.models.response.ProductResponse;
+import com.pullm.backendmonolit.models.response.TransactionDetailsResponse;
 import com.pullm.backendmonolit.models.response.TransactionResponse;
 import com.pullm.backendmonolit.repository.TransactionRepository;
 import com.pullm.backendmonolit.repository.UserRepository;
@@ -23,7 +21,9 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -110,9 +110,23 @@ public class TransactionsServiceImpl {
         var transactionRequests = transactionMapper.mapToTransactionResponseList(transactions);
 
         transactionRequests.sort(Comparator.comparing(TransactionResponse::getDate));
+
+        setFrequentIcon(transactionRequests);
+
         log.info("getAllTransactions().end");
 
         return transactionRequests;
+    }
+
+    private void setFrequentIcon(List<TransactionResponse> transactionRequests) {
+        log.debug("setFrequentIcon().start");
+        for (TransactionResponse detail : transactionRequests) {
+            for (TransactionDetailsResponse resp : detail.getTransactionDetails()) {
+                String chosenIcon = determineIcon(resp.getProducts());
+                resp.setIcon(chosenIcon);
+            }
+        }
+        log.debug("setFrequentIcon().end");
     }
 
     private Pair<LocalDateTime, LocalDateTime> getDateRange(DateCriteria dateCriteria) {
@@ -153,5 +167,38 @@ public class TransactionsServiceImpl {
         var userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return userDetails.getUsername();
+    }
+
+    public String determineIcon(List<ProductResponse> products) {
+        Map<String, BigDecimal> frequencyMap = new HashMap<>();
+        Map<String, BigDecimal> amountMap = new HashMap<>();
+
+        for (ProductResponse product : products) {
+            String icon = product.getIcon();
+            BigDecimal quantity = product.getQuantity();
+            BigDecimal amount = product.getPrice().multiply(quantity);
+
+            frequencyMap.put(icon, frequencyMap.getOrDefault(icon, BigDecimal.ZERO).add(quantity));
+            amountMap.put(icon, amountMap.getOrDefault(icon, BigDecimal.ZERO).add(amount));
+        }
+
+        BigDecimal maxFrequency = frequencyMap.values().stream()
+                .max(Comparator.naturalOrder())
+                .orElse(BigDecimal.ZERO);
+
+        List<String> candidates = frequencyMap.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(maxFrequency))
+                .map(Map.Entry::getKey)
+                .toList();
+
+        if (candidates.size() == 1) {
+            return candidates.get(0);
+        }
+
+        return candidates.stream()
+                .max(Comparator.comparingDouble(icon ->
+                        amountMap.getOrDefault(icon, BigDecimal.ZERO).toBigInteger()
+                                .doubleValue()))
+                .orElse(null);
     }
 }
