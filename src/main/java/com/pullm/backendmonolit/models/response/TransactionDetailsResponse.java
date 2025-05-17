@@ -21,5 +21,6 @@ public class TransactionDetailsResponse {
     private String currency;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateTime;
+    private String icon;
     private List<ProductResponse> products;
 }
